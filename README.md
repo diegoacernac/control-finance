@@ -29,6 +29,7 @@ Registro de finanzas personales con una frase: `taxi oficina 12.50`, `ayer juan 
 ## Qué entiende el texto
 
 - **Monto:** `12.50`, `12,50`, `1,250.00`, `S/ 19.30`, `S/.19.30`, `18 soles`. En dólares: `$20`, `US$ 20`, `2.99 usd`, `15 dólares`. Si hay varios números, gana el que tiene moneda y, si ninguno la tiene, el último.
+- **Números en letras** (como los transcribe Siri): `quince soles`, `doce con cincuenta` (12.50), `treinta y cinco`, `mil doscientos`. "un"/"una" solo cuentan como número antes de "mil" o de una moneda ("un sol"), para no confundirlos con artículos ("un taxi").
 - **Fecha:** `hoy`, `ayer`, `anteayer`, `el lunes` (el último lunes), `05/11`, `28/12/2025`. Sin fecha, es hoy en hora de Lima.
 - **Ingreso:** `+` al inicio, `X me pagó / yapeó / plineó / transfirió` (guarda a X como persona), `cobré`, `recibí`. Si no hay ninguna de estas señales, decide la regla que coincida (`sueldo` es ingreso) y, si no hay regla, es egreso.
 

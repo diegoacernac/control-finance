@@ -125,6 +125,13 @@ describe("tipo y persona", () => {
     assert.equal(movimiento.persona, null);
   });
 
+  it("dictado de Siri con número en letras y posesivo", () => {
+    const movimiento = parsearOk("Mi madre me pagó quince soles");
+    assert.equal(movimiento.tipoExplicito, "ingreso");
+    assert.equal(movimiento.montoCentimos, 1500);
+    assert.equal(movimiento.persona, "Madre");
+  });
+
   it("'me' dentro de otra palabra no cuenta", () => {
     assert.equal(parsearOk("jaime pagó taxi 10").tipoExplicito, null);
   });
