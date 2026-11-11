@@ -11,3 +11,11 @@ export function normalizarParaComparar(texto: string): string {
     .replace(SEPARADORES, " ")
     .trim();
 }
+
+// Los espacios en los bordes hacen que solo coincidan palabras completas:
+// "gas" no debe coincidir dentro de "gaseosa".
+export function contieneFrase(texto: string, frase: string): boolean {
+  const fraseNormalizada = normalizarParaComparar(frase);
+  if (!fraseNormalizada) return false;
+  return ` ${normalizarParaComparar(texto)} `.includes(` ${fraseNormalizada} `);
+}

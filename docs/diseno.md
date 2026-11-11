@@ -14,9 +14,22 @@ Registrar un movimiento debe costar una frase. El texto se convierte en monto, m
 3. Gana el patrón más largo ("comida gato" sobre "comida").
 4. Sin coincidencia: sin categoría y `por_revisar`.
 
+## Fijos y previstos
+- **fijos**: plantilla (monto de referencia, uno o más días de pago, patrones, persona opcional, cuotas opcionales, vigente desde).
+- **previstos**: cada aparición esperada de un fijo en un mes, o un ingreso/egreso único (`fijo_id` null, fecha opcional). Se generan solos con `asegurar_previstos` en cada registro; no hay cron.
+- Al registrar, un movimiento en soles se asocia a un previsto abierto del mismo tipo si el texto contiene uno de sus patrones y, si tiene persona, también la persona. Ventana: hasta 10 días antes de la fecha esperada, sin límite hacia atrás (pagos atrasados).
+- Varios previstos del mismo fijo → se salda el más antiguo. Varios fijos, o persona no mencionada → ambiguo, queda por revisar.
+- Estado: desde el 90% del esperado es `confirmado`; por debajo, `parcial` (sueldo en partes). Un solo cobro que confirma actualiza el monto de referencia del fijo (precios y tipo de cambio que varían).
+- Cuotas: los omitidos no cuentan (el turno propio en la junta). Si se omite un previsto después de generar los siguientes, la numeración de esos queda corrida en uno.
+- Los datos personales (fijos, saldos) se cargan con SQL en `supabase/datos-personales/`, ignorado por git.
+
+## Cuentas y saldo
+- Saldo base conocido (el del banco) en un momento; suman/restan los movimientos en soles de fechas posteriores, o del mismo día registrados después. Vista `saldos_cuentas`.
+- Los registros manuales van a la cuenta predeterminada (Interbank). BBVA existe con saldo 0 hasta integrarla.
+
 ## Fases
 1. **Base** (hecha): esquema, parser, reglas, `POST /api/movimientos` con token, atajo de iOS.
-2. **Fijos**: tabla de fijos (monto, día de pago) y previstos mensuales con estado `pendiente/confirmado/omitido`; registrar "hbo 23.90" confirma el previsto en vez de crear otro movimiento. Totales real y proyectado.
+2. **Fijos** (hecha): fijos, previstos (incluidos únicos), cuentas con saldo.
 3. **Correos**: Gmail (filtro + etiqueta) → Apps Script cada 5 min → `POST /api/correos`. Parsing en TypeScript. Conciliación: misma moneda y monto en una ventana de tiempo → adjuntar fuente; ninguno → movimiento nuevo; varios → bandeja "por conciliar".
 4. **Web** (con Fable): dashboard, bandejas por revisar/por conciliar, gestión de reglas y fijos, login.
 5. **Extras**: categorización con IA para lo que no coincide, servidor MCP para registrar y consultar desde el chat.
@@ -28,3 +41,4 @@ Registrar un movimiento debe costar una frase. El texto se convierte en monto, m
 - **Uber**: el monto real es el de "Pagos"/"Total" (ya con créditos), no la tarifa.
 - **Rappi**: "Total pagado S/.20.54"; el cargo a la tarjeta fue ~1 h después del pedido. La ventana de conciliación debe tolerar horas, no minutos.
 - Formatos de monto: `S/ 11.00`, `S/. 19.30`, `S/.20.54`.
+- **Anthropic (Claude Pro)**: el recibo llega a Outlook, no a Gmail, en US$ 20.00. El monto en soles que importa es el que debita Interbank; falta ver ese correo de consumo en dólares.

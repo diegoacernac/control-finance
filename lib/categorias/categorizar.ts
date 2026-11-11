@@ -1,5 +1,5 @@
 import type { TipoMovimiento } from "../movimientos/tipos.ts";
-import { normalizarParaComparar } from "../texto/normalizar.ts";
+import { contieneFrase } from "../texto/normalizar.ts";
 
 export type ReglaCategoria = {
   patron: string;
@@ -18,10 +18,7 @@ export function categorizar(
   tipoExplicito: TipoMovimiento | null,
   reglas: ReglaCategoria[],
 ): Categorizacion {
-  // Los espacios en los bordes hacen que el patrón coincida solo con palabras
-  // completas: "gas" no debe coincidir dentro de "gaseosa".
-  const texto = ` ${normalizarParaComparar(descripcion)} `;
-  const coincidencias = reglas.filter((r) => texto.includes(` ${normalizarParaComparar(r.patron)} `));
+  const coincidencias = reglas.filter((r) => contieneFrase(descripcion, r.patron));
 
   const elegida = elegirMasEspecifica(filtrarPorTipo(coincidencias, tipoExplicito));
   if (!elegida) return { tipo: tipoExplicito ?? "egreso", categoria: null };

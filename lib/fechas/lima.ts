@@ -15,8 +15,12 @@ export function fechaEnLima(instante: Date): string {
 }
 
 export function restarDias(fechaIso: string, dias: number): string {
+  return sumarDias(fechaIso, -dias);
+}
+
+export function sumarDias(fechaIso: string, dias: number): string {
   const base = Date.parse(`${fechaIso}T00:00:00Z`);
-  return new Date(base - dias * MS_POR_DIA).toISOString().slice(0, 10);
+  return new Date(base + dias * MS_POR_DIA).toISOString().slice(0, 10);
 }
 
 export function diaDeSemana(fechaIso: string): number {
