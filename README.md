@@ -1,0 +1,56 @@
+# finance-control
+
+Registro de finanzas personales con una frase: `taxi oficina 12.50`, `ayer juan me pagó netflix 10`, `+4500 sueldo`. Diseño y fases en [docs/diseno.md](docs/diseno.md).
+
+## Puesta en marcha
+
+1. **Base de datos.** En un proyecto de Supabase, ejecuta en orden los archivos de `supabase/migrations/`. Puedes pegarlos en el SQL Editor o usar `npx supabase db push` con el proyecto enlazado.
+2. **Variables.** Copia `.env.example` a `.env.local` y completa los valores. El token se genera con:
+   ```bash
+   openssl rand -hex 32
+   ```
+3. **Local.**
+   ```bash
+   npm run dev
+   ```
+4. **Vercel.** Carga las mismas tres variables en Project Settings → Environment Variables.
+
+## API
+
+`POST /api/movimientos`, con la cabecera `Authorization: Bearer <INGRESO_API_TOKEN>` y el cuerpo `{"texto": "taxi oficina 12.50"}`.
+
+| Código | Cuándo |
+|---|---|
+| 201 | Registrado. `mensaje` trae el texto corto para mostrar; `movimiento`, el detalle. |
+| 400 | El cuerpo no es `{"texto": "..."}` o pasa de 200 caracteres. |
+| 401 | Falta el token o es incorrecto. |
+| 422 | No se encontró el monto o la descripción. |
+
+## Qué entiende el texto
+
+- **Monto:** `12.50`, `12,50`, `1,250.00`, `S/ 19.30`, `S/.19.30`, `18 soles`. En dólares: `$20`, `US$ 20`, `2.99 usd`, `15 dólares`. Si hay varios números, gana el que tiene moneda y, si ninguno la tiene, el último.
+- **Fecha:** `hoy`, `ayer`, `anteayer`, `el lunes` (el último lunes), `05/11`, `28/12/2025`. Sin fecha, es hoy en hora de Lima.
+- **Ingreso:** `+` al inicio, `X me pagó / yapeó / plineó / transfirió` (guarda a X como persona), `cobré`, `recibí`. Si no hay ninguna de estas señales, decide la regla que coincida (`sueldo` es ingreso) y, si no hay regla, es egreso.
+
+## Atajo de iOS
+
+En la app Atajos, crea un atajo nuevo con estas acciones:
+
+1. **Pedir entrada.** Tipo texto, con la pregunta "¿Qué gastaste?". Si lo lanzas con Siri, puedes dictar la respuesta.
+2. **Obtener contenido de URL.**
+   - URL: `https://<tu-app>.vercel.app/api/movimientos`
+   - Método: `POST`
+   - Encabezados: `Authorization` = `Bearer <tu token>`
+   - Cuerpo: JSON, con la clave `texto` = *Entrada proporcionada*
+3. **Obtener valor del diccionario.** Clave `mensaje`. Si viene vacío, usa la clave `error`.
+4. **Mostrar notificación** con ese valor.
+
+Luego asígnalo al botón de Acción, al toque posterior (Ajustes → Accesibilidad → Tocar → Toque posterior) o a un widget.
+
+El token queda guardado dentro del atajo. No compartas el atajo sin quitarlo antes.
+
+## Pruebas
+
+```bash
+npm test
+```
