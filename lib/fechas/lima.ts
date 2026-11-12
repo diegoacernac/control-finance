@@ -23,8 +23,25 @@ export function sumarDias(fechaIso: string, dias: number): string {
   return new Date(base + dias * MS_POR_DIA).toISOString().slice(0, 10);
 }
 
+export function inicioDeMes(fechaIso: string): string {
+  return `${fechaIso.slice(0, 7)}-01`;
+}
+
+export function finDeMes(fechaIso: string): string {
+  const [anio, mes] = fechaIso.split("-").map(Number);
+  return new Date(Date.UTC(anio, mes, 0)).toISOString().slice(0, 10);
+}
+
 export function diaDeSemana(fechaIso: string): number {
   return new Date(`${fechaIso}T00:00:00Z`).getUTCDay();
+}
+
+const PATRON_FECHA_ISO = /^(\d{4})-(\d{2})-(\d{2})$/;
+
+export function esFechaIsoValida(texto: string): boolean {
+  const partes = texto.match(PATRON_FECHA_ISO);
+  if (!partes) return false;
+  return construirFechaIso(Number(partes[1]), Number(partes[2]), Number(partes[3])) === texto;
 }
 
 export function construirFechaIso(anio: number, mes: number, dia: number): string | null {

@@ -1,8 +1,7 @@
 import { tokenApiValido } from "@/lib/auth/token-api.ts";
 import { mensajeDeConfirmacion } from "@/lib/movimientos/mensaje-confirmacion.ts";
+import { LARGO_MAXIMO_TEXTO } from "@/lib/movimientos/limites.ts";
 import { registrarMovimientoManual } from "@/lib/movimientos/registrar-movimiento-manual.ts";
-
-const LARGO_MAXIMO_TEXTO = 200;
 
 export async function POST(request: Request) {
   if (!tokenApiValido(request.headers.get("authorization"))) {
@@ -18,7 +17,11 @@ export async function POST(request: Request) {
   }
 
   const resultado = await registrarMovimientoManual(texto);
-  if (!resultado.ok) return Response.json({ error: resultado.error }, { status: 422 });
+  // Devolver lo recibido permite ver en el atajo qué transcribió Siri o qué
+  // variable se envió, sin guardar el texto en los logs del servidor.
+  if (!resultado.ok) {
+    return Response.json({ error: `${resultado.error}. Recibí: "${texto}"` }, { status: 422 });
+  }
 
   return Response.json(
     { mensaje: mensajeDeConfirmacion(resultado.movimiento), movimiento: resultado.movimiento },

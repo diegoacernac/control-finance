@@ -8,7 +8,7 @@ import { elegirPrevisto, type EleccionPrevisto } from "../previstos/elegir-previ
 import { crearClienteServidor } from "../supabase/cliente-servidor.ts";
 import type { Moneda, TipoMovimiento } from "./tipos.ts";
 
-export type EstadoPrevisto = "pendiente" | "parcial" | "confirmado" | "omitido";
+export type EstadoPrevisto ="pendiente" | "parcial" | "confirmado" | "omitido";
 
 export type MovimientoRegistrado = {
   id: number;

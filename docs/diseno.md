@@ -27,11 +27,20 @@ Registrar un movimiento debe costar una frase. El texto se convierte en monto, m
 - Saldo base conocido (el del banco) en un momento; suman/restan los movimientos en soles de fechas posteriores, o del mismo día registrados después. Vista `saldos_cuentas`.
 - Los registros manuales van a la cuenta predeterminada (Interbank). BBVA existe con saldo 0 hasta integrarla.
 
+## Web
+- Login por enlace al correo (Supabase Auth, PKCE). `proxy.ts` renueva la sesión; cada página y cada acción llama a `exigirPropietario`, que solo acepta el correo de `CORREO_PROPIETARIO`.
+- La base sigue cerrada a `anon`/`authenticated`: la web lee y escribe desde el servidor con la clave secreta, después de verificar la sesión. No hay Supabase en el navegador.
+- "Cierras el mes con" = saldo de las cuentas + restante de previstos abiertos de ingreso − restante de los de egreso, con fecha hasta fin de mes (incluye atrasados; excluye sin fecha y posteriores).
+- Calendario: un día con algo abierto manda sobre lo resuelto; los omitidos no pintan.
+- Estilo: papel y tinta, Fraunces para títulos y cifras grandes, IBM Plex Mono para datos, bordes rectos. Modo nocturno automático. Tokens en `app/globals.css`.
+- Registro desde la web con el mismo parser que el atajo. Edición de monto, fecha, descripción y destino de los últimos 10 movimientos; la función `editar_movimiento` recalcula el previsto anterior y el nuevo. Tipo y moneda no se editan (se elimina y se vuelve a registrar).
+- Pendiente: editar fijos y reglas, historial con filtros (y editar movimientos más antiguos), actualizar saldo base, crear regla al corregir.
+
 ## Fases
 1. **Base** (hecha): esquema, parser, reglas, `POST /api/movimientos` con token, atajo de iOS.
 2. **Fijos** (hecha): fijos, previstos (incluidos únicos), cuentas con saldo.
 3. **Correos**: Gmail (filtro + etiqueta) → Apps Script cada 5 min → `POST /api/correos`. Parsing en TypeScript. Conciliación: misma moneda y monto en una ventana de tiempo → adjuntar fuente; ninguno → movimiento nuevo; varios → bandeja "por conciliar".
-4. **Web** (con Fable): dashboard, bandejas por revisar/por conciliar, gestión de reglas y fijos, login.
+4. **Web** (primera versión hecha): login, dashboard, omitir/reabrir previstos, bandeja por revisar, eliminar registros.
 5. **Extras**: categorización con IA para lo que no coincide, servidor MCP para registrar y consultar desde el chat.
 
 ## Notas para la fase 3 (correos vistos)

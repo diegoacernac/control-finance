@@ -1,69 +1,77 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import { connection } from "next/server";
+import { exigirPropietario } from "@/lib/auth/propietario.ts";
+import { fechaLarga, nombreDelMes } from "@/lib/fechas/formato.ts";
+import { fechaEnLima, finDeMes } from "@/lib/fechas/lima.ts";
+import { agruparPrevistos } from "@/lib/panel/agrupar-previstos.ts";
+import { construirCalendario } from "@/lib/panel/calendario.ts";
+import { cargarPanel } from "@/lib/panel/cargar-panel.ts";
+import { calcularGastoDelMes } from "@/lib/panel/gasto-por-categoria.ts";
+import { calcularProyeccion, estaAbierto } from "@/lib/panel/proyeccion.ts";
+import { leerTema } from "@/lib/tema.ts";
+import { CalendarioMes } from "./_componentes/CalendarioMes.tsx";
+import { GastoPorCategoria } from "./_componentes/GastoPorCategoria.tsx";
+import { PorRevisar } from "./_componentes/PorRevisar.tsx";
+import { PrevistosDelMes } from "./_componentes/PrevistosDelMes.tsx";
+import { RegistroRapido } from "./_componentes/RegistroRapido.tsx";
+import { ResumenMes } from "./_componentes/ResumenMes.tsx";
+import { SelectorTema } from "./_componentes/SelectorTema.tsx";
+import { UltimosMovimientos } from "./_componentes/UltimosMovimientos.tsx";
+import { cerrarSesion } from "./ingresar/acciones.ts";
+import estilos from "./panel.module.css";
 
-export default function Home() {
+export default async function PaginaPanel() {
+  await exigirPropietario();
+
+  // "Hoy" cambia en cada visita: se calcula al momento del pedido, nunca de antemano.
+  await connection();
+  const hoy = fechaEnLima(new Date());
+  const fin = finDeMes(hoy);
+  const datos = await cargarPanel(hoy);
+  const saldoTotal = datos.saldos.reduce((suma, cuenta) => suma + cuenta.saldoCentimos, 0);
+  const previstosAbiertos = datos.previstos.filter(estaAbierto);
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <main className={estilos.panel}>
+      <header className={estilos.cabecera}>
+        <div>
+          <h1 className={estilos.marca}>Finanzas</h1>
+          <p className={estilos.fechaHoy}>{fechaLarga(hoy)}</p>
+        </div>
+        <div className={estilos.acciones}>
+          <SelectorTema actual={await leerTema()} />
+          <form action={cerrarSesion}>
+            <button type="submit" className={estilos.botonTexto}>
+              Salir
+            </button>
+          </form>
+        </div>
+      </header>
+
+      <RegistroRapido />
+
+      <div className={`${estilos.columna} ${estilos.columnaFija}`}>
+        <ResumenMes
+          mes={nombreDelMes(hoy)}
+          proyeccion={calcularProyeccion(saldoTotal, datos.previstos, fin)}
+          saldos={datos.saldos}
         />
-        <div className={styles.intro}>
-          <h1>
-            To get started, edit the{" "}
-            <code className={styles.code}>page.tsx</code> file.
-          </h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+        <CalendarioMes calendario={construirCalendario(datos.previstos, hoy)} />
+      </div>
+
+      <div className={estilos.columna}>
+        <PorRevisar
+          movimientos={datos.porRevisar}
+          previstosAbiertos={previstosAbiertos}
+          categorias={datos.categorias}
+        />
+        <PrevistosDelMes grupos={agruparPrevistos(datos.previstos, hoy, fin)} />
+        <GastoPorCategoria gasto={calcularGastoDelMes(datos.movimientosDelMes)} />
+        <UltimosMovimientos
+          movimientos={datos.ultimosMovimientos}
+          previstosAbiertos={previstosAbiertos}
+          categorias={datos.categorias}
+        />
+      </div>
+    </main>
   );
 }

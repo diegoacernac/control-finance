@@ -15,6 +15,21 @@ Registro de finanzas personales con una frase: `taxi oficina 12.50`, `ayer juan 
    ```
 4. **Vercel.** Carga las mismas tres variables en Project Settings → Environment Variables.
 
+## Web
+
+Arriba hay un campo para anotar un movimiento con el mismo texto que el atajo. En "Últimos registros", cada movimiento se puede editar (monto, fecha, descripción y a qué corresponde) o eliminar.
+
+La página principal muestra con cuánto cierras el mes, el calendario de pagos y cobros, lo que viene, lo que quedó por revisar, el gasto por categoría y los últimos registros. Solo entra el correo de `CORREO_PROPIETARIO`, con un enlace que llega por correo.
+
+Para activarla:
+
+1. Ejecuta las migraciones `20261112000004_vistas_y_acciones_web.sql` y `20261112000005_editar_movimiento.sql`.
+2. Agrega `SUPABASE_PUBLISHABLE_KEY` y `CORREO_PROPIETARIO` en `.env.local` y en Vercel.
+3. En Supabase → Authentication → URL Configuration, pon tu URL de Vercel como **Site URL** y agrega en **Redirect URLs** `https://<tu-app>.vercel.app/auth/confirmar` y `http://localhost:3000/auth/confirmar`.
+4. Después de entrar por primera vez, desactiva "Allow new users to sign up" en Supabase → Authentication → Sign In / Providers. Así nadie más puede crear una cuenta en tu proyecto.
+
+El enlace del correo debe abrirse en el mismo navegador donde lo pediste.
+
 ## API
 
 `POST /api/movimientos`, con la cabecera `Authorization: Bearer <INGRESO_API_TOKEN>` y el cuerpo `{"texto": "taxi oficina 12.50"}`.

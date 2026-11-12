@@ -1,9 +1,5 @@
+import { formatearMonto } from "./formato-monto.ts";
 import type { MovimientoRegistrado } from "./registrar-movimiento-manual.ts";
-import type { Moneda } from "./tipos.ts";
-
-export function formatearMonto(centimos: number, moneda: Moneda): string {
-  return new Intl.NumberFormat("es-PE", { style: "currency", currency: moneda }).format(centimos / 100);
-}
 
 // Texto corto que el atajo de iOS muestra como notificación.
 export function mensajeDeConfirmacion(movimiento: MovimientoRegistrado): string {

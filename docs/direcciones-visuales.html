@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Direcciones visuales</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=IBM+Plex+Mono:wght@400;500&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { background: #d9d7d2; font-family: system-ui, sans-serif; padding: 24px 16px 48px; color: #222; }
+  .intro { max-width: 1180px; margin: 0 auto 20px; font-size: 14px; line-height: 1.5; }
+  .intro strong { font-size: 16px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; max-width: 1180px; margin: 0 auto; align-items: start; }
+  .etiqueta { font-size: 13px; margin-bottom: 8px; }
+  .etiqueta b { font-size: 15px; }
+  .fila { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  /* A — Libreta */
+  .a { background: #f4efe6; color: #1f1b16; padding: 28px 24px 32px; font-family: "IBM Plex Mono", monospace; font-size: 13px; }
+  .a h2 { font-family: Fraunces, serif; font-weight: 400; font-size: 15px; font-style: italic; }
+  .a .saldo { font-family: Fraunces, serif; font-weight: 600; font-size: 54px; line-height: 1; letter-spacing: -0.02em; margin: 6px 0 4px; }
+  .a .saldo small { font-size: 22px; font-weight: 400; }
+  .a .sub { color: #6b6257; }
+  .a hr { border: 0; border-top: 1px solid #1f1b16; margin: 20px 0 12px; }
+  .a hr.fino { border-top: 1px dotted #a39a8c; margin: 0; }
+  .a .titulo { font-family: Fraunces, serif; font-size: 20px; font-weight: 600; margin-bottom: 8px; }
+  .a .fila { padding: 7px 0; }
+  .a .rojo { color: #b4442c; } .a .verde { color: #2f6b4f; }
+  .a .tachado { text-decoration: line-through; color: #a39a8c; }
+  .a .nota { font-family: Fraunces, serif; font-style: italic; font-size: 14px; color: #6b6257; margin-top: 18px; }
+
+  /* B — Consola */
+  .b { background: #0e1110; color: #c9d1cc; padding: 24px 20px 28px; font-family: "JetBrains Mono", monospace; font-size: 12.5px; line-height: 1.55; }
+  .b .dim { color: #6f7a74; } .b .ok { color: #7ce0a3; } .b .pend { color: #e8b04a; } .b .neg { color: #f0776a; }
+  .b .saldo { font-size: 40px; font-weight: 700; color: #7ce0a3; letter-spacing: -0.03em; line-height: 1.1; margin: 4px 0; }
+  .b .caja { border: 1px solid #2a312d; padding: 10px 12px; margin-top: 14px; }
+  .b .cab { color: #6f7a74; text-transform: uppercase; letter-spacing: 0.08em; font-size: 11px; margin-bottom: 6px; }
+  .b .barra { display: grid; grid-template-columns: 88px 1fr 64px; gap: 8px; align-items: center; }
+  .b .barra i { display: block; height: 8px; background: #7ce0a3; }
+  .b .barra span:last-child { text-align: right; }
+  .b .pista { background: #1a201d; }
+
+  /* C — Cartel */
+  .c { background: #fafaf7; color: #0b0b0b; padding: 0 0 28px; font-family: "Space Grotesk", sans-serif; font-size: 14px; }
+  .c .cabeza { background: #2b4eff; color: #fff; padding: 22px 22px 20px; }
+  .c .cabeza .mini { font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.85; }
+  .c .saldo { font-size: 60px; font-weight: 700; letter-spacing: -0.04em; line-height: 0.95; margin: 10px 0 12px; }
+  .c .saldo small { font-size: 24px; font-weight: 500; }
+  .c .par { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 2px solid #0b0b0b; }
+  .c .par div { padding: 14px 22px; }
+  .c .par div + div { border-left: 2px solid #0b0b0b; }
+  .c .par b { display: block; font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
+  .c .mini2 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #5b5b57; }
+  .c .seccion { padding: 18px 22px 0; }
+  .c .dias { display: grid; grid-template-columns: repeat(15, 1fr); gap: 3px; margin: 10px 0 4px; }
+  .c .dias span { aspect-ratio: 1; border: 1.5px solid #0b0b0b; font-size: 10px; display: grid; place-items: center; }
+  .c .dias .hecho { background: #0b0b0b; color: #fafaf7; }
+  .c .dias .hoy { background: #2b4eff; color: #fff; border-color: #2b4eff; }
+  .c .dias .vacio { border-color: #d5d4cd; color: #b3b2aa; }
+  .c .fila { padding: 9px 0; border-bottom: 1px solid #d5d4cd; }
+  .c .fila b { font-weight: 700; }
+  .c .chip { font-size: 11px; font-weight: 700; padding: 2px 6px; border: 1.5px solid currentColor; margin-left: 6px; }
+  .c .azul { color: #2b4eff; }
+</style>
+</head>
+<body>
+<div class="intro">
+  <strong>Tres direcciones para el dashboard</strong><br>
+  Mismo contenido en las tres (vista de celular): saldo, con cuánto cierras el mes, lo que falta cobrar y pagar, y gasto por categoría. Los montos son de ejemplo.
+</div>
+
+<div class="grid">
+
+<section>
+  <div class="etiqueta"><b>A · Libreta</b>: papel, tinta y números con serif. Se lee como un cuaderno de cuentas.</div>
+  <div class="a">
+    <h2>Noviembre, miércoles 11</h2>
+    <div class="saldo"><small>S/</small> 360<small>.47</small></div>
+    <div class="sub">Interbank 360.47 · BBVA 0.00</div>
+    <hr>
+    <div class="fila"><span>Falta cobrar</span><span class="num verde">+ 2,986.00</span></div>
+    <hr class="fino">
+    <div class="fila"><span>Falta pagar</span><span class="num rojo">− 1,071.38</span></div>
+    <hr class="fino">
+    <div class="fila"><b>Cierras el mes con</b><b class="num">2,275.09</b></div>
+    <hr>
+    <div class="titulo">Lo que viene</div>
+    <div class="fila"><span>11 · Claude Pro</span><span class="num rojo">79.06</span></div><hr class="fino">
+    <div class="fila"><span>14 · Prime, Apple, Uber</span><span class="num rojo">72.78</span></div><hr class="fino">
+    <div class="fila"><span>15 · Pozo de la junta</span><span class="num verde">1,050.00</span></div><hr class="fino">
+    <div class="fila"><span>17 · HBO</span><span class="num rojo">26.90</span></div><hr class="fino">
+    <div class="fila"><span class="tachado">03 · Ripley, cuota 5/15</span><span class="num tachado">100.35</span></div>
+    <div class="nota">Sueldo: recibido 1,000 de 2,800. Faltan 1,800.</div>
+  </div>
+</section>
+
+<section>
+  <div class="etiqueta"><b>B · Consola</b>: oscuro, monoespaciado y denso. Todo a la vista, como un estado de cuenta en terminal.</div>
+  <div class="b">
+    <div class="dim">finanzas · nov 2026 · día 11/30</div>
+    <div class="saldo">S/ 360.47</div>
+    <div><span class="dim">interbank</span> 360.47 &nbsp;<span class="dim">bbva</span> 0.00</div>
+    <div class="caja">
+      <div class="cab">Proyección</div>
+      <div class="fila"><span>por cobrar</span><span class="num ok">+2,986.00</span></div>
+      <div class="fila"><span>por pagar</span><span class="num neg">-1,071.38</span></div>
+      <div class="fila"><span>cierre estimado</span><span class="num">2,275.09</span></div>
+    </div>
+    <div class="caja">
+      <div class="cab">Previstos · 14 abiertos</div>
+      <div class="fila"><span><span class="pend">○</span> 11 claude pro</span><span class="num">79.06</span></div>
+      <div class="fila"><span><span class="pend">○</span> 14 prime</span><span class="num">25.90</span></div>
+      <div class="fila"><span><span class="pend">○</span> 15 pozo junta</span><span class="num ok">+1,050.00</span></div>
+      <div class="fila"><span><span class="pend">◐</span> 05 sueldo <span class="dim">1000/2800</span></span><span class="num ok">+1,800.00</span></div>
+      <div class="fila dim"><span><span class="ok">●</span> 03 ripley 5/15</span><span class="num">100.35</span></div>
+    </div>
+    <div class="caja">
+      <div class="cab">Gasto del mes · 567.95</div>
+      <div class="barra"><span>préstamos</span><span class="pista"><i style="width:53%"></i></span><span class="num">300.35</span></div>
+      <div class="barra"><span>servicios</span><span class="pista"><i style="width:27%"></i></span><span class="num">154.70</span></div>
+      <div class="barra"><span>plataformas</span><span class="pista"><i style="width:10%"></i></span><span class="num">58.90</span></div>
+      <div class="barra"><span>junta</span><span class="pista"><i style="width:9%"></i></span><span class="num">50.00</span></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="etiqueta"><b>C · Cartel</b>: tipografía grande, un solo azul y bordes rectos. El mes se ve como calendario.</div>
+  <div class="c">
+    <div class="cabeza">
+      <div class="mini">Cierras noviembre con</div>
+      <div class="saldo"><small>S/</small>2,275</div>
+      <div>Hoy tienes S/ 360.47 · Interbank 360.47 · BBVA 0</div>
+    </div>
+    <div class="par">
+      <div><span class="mini2">Falta cobrar</span><b>2,986.00</b></div>
+      <div><span class="mini2">Falta pagar</span><b>1,071.38</b></div>
+    </div>
+    <div class="seccion">
+      <span class="mini2">Pagos del mes</span>
+      <div class="dias">
+        <span class="hecho">1</span><span class="vacio">2</span><span class="hecho">3</span><span class="vacio">4</span><span class="hecho">5</span>
+        <span class="vacio">6</span><span class="vacio">7</span><span class="vacio">8</span><span class="vacio">9</span><span>10</span>
+        <span class="hoy">11</span><span class="vacio">12</span><span class="vacio">13</span><span>14</span><span>15</span>
+        <span class="vacio">16</span><span>17</span><span>18</span><span class="vacio">19</span><span>20</span>
+        <span class="vacio">21</span><span class="vacio">22</span><span class="vacio">23</span><span>24</span><span class="vacio">25</span>
+        <span class="vacio">26</span><span class="vacio">27</span><span>28</span><span class="vacio">29</span><span>30</span>
+      </div>
+    </div>
+    <div class="seccion">
+      <span class="mini2">Lo que viene</span>
+      <div class="fila"><span><b>11</b> &nbsp;Claude Pro<span class="chip azul">HOY</span></span><span class="num">79.06</span></div>
+      <div class="fila"><span><b>14</b> &nbsp;Prime, Apple, Uber</span><span class="num">72.78</span></div>
+      <div class="fila"><span><b>15</b> &nbsp;Pozo de la junta</span><span class="num azul">+1,050.00</span></div>
+      <div class="fila"><span><b>05</b> &nbsp;Sueldo<span class="chip">PARCIAL</span></span><span class="num azul">+1,800.00</span></div>
+    </div>
+  </div>
+</section>
+
+</div>
+</body>
+</html>
