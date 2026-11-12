@@ -30,6 +30,23 @@ export async function enviarEnlace(_anterior: EstadoIngreso, formulario: FormDat
   return { mensaje: "Si el correo es el correcto, te llegó un enlace para entrar. Ábrelo en este mismo navegador.", esError: false };
 }
 
+// Google devuelve al usuario a /auth/confirmar con un código; ahí se crea la
+// sesión y se comprueba que la cuenta sea la del propietario.
+export async function ingresarConGoogle(): Promise<void> {
+  const origen = (await headers()).get("origin");
+  const supabase = await crearClienteSesion();
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: `${origen}/auth/confirmar`,
+      queryParams: { prompt: "select_account" },
+    },
+  });
+
+  if (error || !data.url) redirect(`${RUTA_INGRESO}?error=google`);
+  redirect(data.url);
+}
+
 export async function cerrarSesion(): Promise<void> {
   const supabase = await crearClienteSesion();
   await supabase.auth.signOut();

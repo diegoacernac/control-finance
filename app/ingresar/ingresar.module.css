@@ -20,6 +20,23 @@
   margin: 14px 0 28px;
 }
 
+.google {
+  display: grid;
+  margin-top: 28px;
+}
+
+.alternativa {
+  margin-top: 24px;
+}
+
+.alternativa > summary {
+  cursor: pointer;
+  color: var(--tenue);
+  font-size: 13px;
+  padding: 6px 0;
+  margin-bottom: 10px;
+}
+
 .formulario {
   display: grid;
   gap: 8px;
@@ -55,9 +72,13 @@
 
 .mensaje,
 .mensajeError {
-  min-height: 3em;
-  margin-top: 8px;
+  margin-top: 16px;
   color: var(--tenue);
+}
+
+.mensaje:empty,
+.mensajeError:empty {
+  display: none;
 }
 
 .mensajeError {

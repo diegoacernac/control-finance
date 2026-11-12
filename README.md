@@ -30,6 +30,14 @@ Para activarla:
 
 El enlace del correo debe abrirse en el mismo navegador donde lo pediste.
 
+### Entrar con Google
+
+1. En Google Cloud Console → APIs y servicios → Pantalla de consentimiento de OAuth: tipo **Externo**, y agrega tu correo como usuario de prueba.
+2. En Credenciales → Crear credenciales → **ID de cliente de OAuth**, tipo Aplicación web. En "URI de redireccionamiento autorizados" pega la Callback URL que muestra Supabase en Authentication → Sign In / Providers → Google (`https://<proyecto>.supabase.co/auth/v1/callback`).
+3. En ese mismo panel de Supabase, activa Google y pega el Client ID y el Client Secret.
+
+Solo entra la cuenta de Google cuyo correo sea `CORREO_PROPIETARIO`.
+
 ## API
 
 `POST /api/movimientos`, con la cabecera `Authorization: Bearer <INGRESO_API_TOKEN>` y el cuerpo `{"texto": "taxi oficina 12.50"}`.
