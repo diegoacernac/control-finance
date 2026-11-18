@@ -47,7 +47,7 @@ export default async function PaginaPanel() {
         </div>
       </header>
 
-      <RegistroRapido />
+      <RegistroRapido hoy={hoy} />
 
       <div className={`${estilos.columna} ${estilos.columnaFija}`}>
         <ResumenMes
@@ -64,7 +64,7 @@ export default async function PaginaPanel() {
           previstosAbiertos={previstosAbiertos}
           categorias={datos.categorias}
         />
-        <PrevistosDelMes grupos={agruparPrevistos(datos.previstos, hoy, fin)} />
+        <PrevistosDelMes grupos={agruparPrevistos(datos.previstos, hoy, fin)} hoy={hoy} />
         <GastoPorCategoria gasto={calcularGastoDelMes(datos.movimientosDelMes)} />
         <UltimosMovimientos
           movimientos={datos.ultimosMovimientos}

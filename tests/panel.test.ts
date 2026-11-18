@@ -24,6 +24,7 @@ function previsto(campos: Partial<PrevistoPanel> & Pick<PrevistoPanel, "nombre">
     estado: "pendiente",
     montoEsperadoCentimos: 1000,
     pagadoCentimos: 0,
+    prestadoCentimos: null,
     ...campos,
   };
 }
@@ -39,6 +40,7 @@ function movimiento(campos: Partial<MovimientoPanel>): MovimientoPanel {
     categoriaNombre: "Comida",
     categoriaRaiz: "Comida",
     previstoNombre: null,
+    cuentaComoGasto: true,
     ...campos,
   };
 }

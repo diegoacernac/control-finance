@@ -21,7 +21,9 @@ const BORDES_SIN_CONTENIDO = /^[\s\p{P}]+|[\s\p{P}]+$/gu;
 // El orden importa: los números dictados en letras pasan a dígitos primero; la
 // fecha sale antes que el monto para que "10/11" no se lea como monto, y el "+"
 // inicial antes del monto para que "+4500" no lo arrastre.
-export function parsearTexto(texto: string, hoy: string): ResultadoParseo {
+// tipoElegido viene del menú del atajo o de la web (Pago/Cobro) y manda sobre
+// lo que se deduzca del texto.
+export function parsearTexto(texto: string, hoy: string, tipoElegido: TipoMovimiento | null = null): ResultadoParseo {
   const { fecha, textoRestante: sinFecha } = extraerFecha(convertirNumerosEnPalabras(texto), hoy);
   const senales = detectarSenalesDeTipo(sinFecha);
 
@@ -34,7 +36,7 @@ export function parsearTexto(texto: string, hoy: string): ResultadoParseo {
   return {
     ok: true,
     movimiento: {
-      tipoExplicito: senales.tipoExplicito,
+      tipoExplicito: tipoElegido ?? senales.tipoExplicito,
       montoCentimos: monto.montoCentimos,
       moneda: monto.moneda,
       fecha,

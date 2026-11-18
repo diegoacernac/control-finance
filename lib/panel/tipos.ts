@@ -13,6 +13,7 @@ export type PrevistoPanel = {
   estado: EstadoPrevisto;
   montoEsperadoCentimos: number;
   pagadoCentimos: number;
+  prestadoCentimos: number | null;
 };
 
 export type MovimientoPanel = {
@@ -25,6 +26,7 @@ export type MovimientoPanel = {
   categoriaNombre: string | null;
   categoriaRaiz: string | null;
   previstoNombre: string | null;
+  cuentaComoGasto: boolean;
 };
 
 export type SaldoCuenta = { id: number; nombre: string; saldoCentimos: number };

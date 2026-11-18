@@ -1,12 +1,18 @@
 import type { TipoMovimiento } from "../movimientos/tipos.ts";
+import { formatearNombre } from "../texto/nombres.ts";
 
 type SenalesDeTipo = { tipoExplicito: TipoMovimiento | null; persona: string | null; textoRestante: string };
 
 const MARCA_INGRESO_INICIAL = /^\s*\+\s*/;
-const FRASE_INGRESO_CON_PERSONA =
-  /^\s*(?<persona>[\p{L}\s]*?)\s*(?<!\p{L})me\s+(?:pag[oó]|yape[oó]|plin[eé][oó]|transfiri[oó]|devolvi[oó])(?!\p{L})/iu;
-const POSESIVOS = new Set(["mi", "mis", "tu", "tus"]);
-const PALABRA_INGRESO =/(?<!\p{L})(?:cobr[eé]|recib[ií])(?!\p{L})/iu;
+
+// Singular y plural: "me pagó" / "me pagaron", "me yapeó" / "me yapearon"…
+const VERBOS_DE_COBRO =
+  "pag(?:[oó]|aron)|yape(?:[oó]|aron)|plin(?:e[oó]|earon)|transfiri(?:[oó]|eron)|devolvi(?:[oó]|eron)|deposit(?:[oó]|aron)|envi(?:[oó]|aron)|abon(?:[oó]|aron)";
+const FRASE_INGRESO_CON_PERSONA = new RegExp(
+  `^\\s*(?<persona>[\\p{L}\\s]*?)\\s*(?<!\\p{L})me\\s+(?:${VERBOS_DE_COBRO})(?!\\p{L})`,
+  "iu",
+);
+const PALABRA_INGRESO = /(?<!\p{L})(?:cobr[eé]|recib[ií])(?!\p{L})/iu;
 
 // Sin señal explícita el tipo queda en null y lo decide la regla que coincida
 // ("sueldo" es ingreso por su categoría); si tampoco hay regla, es egreso.
@@ -16,17 +22,9 @@ export function detectarSenalesDeTipo(texto: string): SenalesDeTipo {
 
   const frase = textoRestante.match(FRASE_INGRESO_CON_PERSONA);
   if (frase) {
-    return { tipoExplicito: "ingreso", persona: formatearPersona(frase.groups?.persona), textoRestante };
+    return { tipoExplicito: "ingreso", persona: formatearNombre(frase.groups?.persona), textoRestante };
   }
 
   const esIngreso = tieneMarcaMas || PALABRA_INGRESO.test(textoRestante);
   return { tipoExplicito: esIngreso ? "ingreso" : null, persona: null, textoRestante };
-}
-
-// "mi madre me pagó" → "Madre": el posesivo no es parte del nombre.
-function formatearPersona(nombre: string | undefined): string | null {
-  const palabras = nombre?.trim().split(/\s+/).filter(Boolean) ?? [];
-  if (palabras.length > 1 && POSESIVOS.has(palabras[0].toLowerCase())) palabras.shift();
-  if (palabras.length === 0) return null;
-  return palabras.map((p) => p[0].toUpperCase() + p.slice(1).toLowerCase()).join(" ");
 }

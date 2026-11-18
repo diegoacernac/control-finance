@@ -1,6 +1,6 @@
 import { sumarDias } from "../fechas/lima.ts";
 import type { TipoMovimiento } from "../movimientos/tipos.ts";
-import { contieneFrase } from "../texto/normalizar.ts";
+import { contieneFrase, normalizarParaComparar } from "../texto/normalizar.ts";
 
 export type PrevistoAbierto = {
   id: number;
@@ -36,8 +36,13 @@ export function elegirPrevisto(
 
   // "disney 15" sin decir quién pagó: la palabra coincide pero ninguna persona,
   // así que se pregunta en vez de adivinar.
-  const candidatos = porPatron.filter((p) => coincidePersona(p, descripcion));
-  if (candidatos.length === 0) return ambiguo(porPatron);
+  const conPersona = porPatron.filter((p) => coincidePersona(p, descripcion));
+  if (conPersona.length === 0) return ambiguo(porPatron);
+
+  // "gaby me pagó disney 15": coinciden la Disney de Gaby (por "disney") y su
+  // préstamo (solo por el nombre). Gana el que coincide por algo más que el nombre.
+  const especificos = conPersona.filter((p) => !coincideSoloPorPersona(p, descripcion));
+  const candidatos = especificos.length > 0 ? especificos : conPersona;
 
   // Varios previstos del mismo fijo (sueldo de noviembre parcial y el de
   // diciembre) no son ambigüedad: se salda el más antiguo. Varios fijos
@@ -52,12 +57,23 @@ function ambiguo(previstos: PrevistoAbierto[]): EleccionPrevisto {
   return { resultado: "ambiguo", nombres: [...new Set(previstos.map(nombreVisible))] };
 }
 
+// La ventana evita tomar el pago de este mes como el del mes siguiente de un
+// fijo. Un previsto único (un préstamo) no se repite: si te devuelven antes, cuenta.
 function dentroDeVentana(previsto: PrevistoAbierto, limite: string): boolean {
-  return previsto.fechaEsperada === null || previsto.fechaEsperada <= limite;
+  if (previsto.fijoId === null || previsto.fechaEsperada === null) return true;
+  return previsto.fechaEsperada <= limite;
 }
 
 function coincidePatron(previsto: PrevistoAbierto, descripcion: string): boolean {
   return previsto.patrones.some((patron) => contieneFrase(descripcion, patron));
+}
+
+function coincideSoloPorPersona(previsto: PrevistoAbierto, descripcion: string): boolean {
+  if (previsto.persona === null) return false;
+  const persona = normalizarParaComparar(previsto.persona);
+  return previsto.patrones
+    .filter((patron) => contieneFrase(descripcion, patron))
+    .every((patron) => normalizarParaComparar(patron) === persona);
 }
 
 function coincidePersona(previsto: PrevistoAbierto, descripcion: string): boolean {

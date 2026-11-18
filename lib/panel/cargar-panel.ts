@@ -28,6 +28,7 @@ type FilaPrevisto = {
   estado: EstadoPrevisto;
   monto_esperado_centimos: number;
   pagado_centimos: number;
+  prestado_centimos: number | null;
 };
 
 type FilaMovimiento = {
@@ -40,14 +41,15 @@ type FilaMovimiento = {
   categoria_nombre: string | null;
   categoria_raiz: string | null;
   previsto_nombre: string | null;
+  cuenta_como_gasto: boolean;
 };
 
 type FilaCategoria = { id: number; tipo: TipoMovimiento; nombre_completo: string };
 
 const COLUMNAS_PREVISTO =
-  "id, nombre, tipo, categoria_nombre, persona, fecha_esperada, numero_cuota, cuotas_total, estado, monto_esperado_centimos, pagado_centimos";
+  "id, nombre, tipo, categoria_nombre, persona, fecha_esperada, numero_cuota, cuotas_total, estado, monto_esperado_centimos, pagado_centimos, prestado_centimos";
 const COLUMNAS_MOVIMIENTO =
-  "id, tipo, monto_centimos, moneda, fecha, descripcion, categoria_nombre, categoria_raiz, previsto_nombre";
+  "id, tipo, monto_centimos, moneda, fecha, descripcion, categoria_nombre, categoria_raiz, previsto_nombre, cuenta_como_gasto";
 const CANTIDAD_ULTIMOS_MOVIMIENTOS = 10;
 
 export async function cargarPanel(hoy: string): Promise<DatosPanel> {
@@ -126,6 +128,7 @@ function aPrevisto(fila: FilaPrevisto): PrevistoPanel {
     estado: fila.estado,
     montoEsperadoCentimos: fila.monto_esperado_centimos,
     pagadoCentimos: fila.pagado_centimos,
+    prestadoCentimos: fila.prestado_centimos,
   };
 }
 
@@ -140,5 +143,6 @@ function aMovimiento(fila: FilaMovimiento): MovimientoPanel {
     categoriaNombre: fila.categoria_nombre,
     categoriaRaiz: fila.categoria_raiz,
     previstoNombre: fila.previsto_nombre,
+    cuentaComoGasto: fila.cuenta_como_gasto,
   };
 }

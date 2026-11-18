@@ -23,6 +23,17 @@ Registrar un movimiento debe costar una frase. El texto se convierte en monto, m
 - Cuotas: los omitidos no cuentan (el turno propio en la junta). Si se omite un previsto después de generar los siguientes, la numeración de esos queda corrida en uno.
 - Los datos personales (fijos, saldos) se cargan con SQL en `supabase/datos-personales/`, ignorado por git.
 
+## Préstamos otorgados
+- Prestar = un movimiento de egreso en la categoría "Préstamo otorgado" (resta del saldo, no cuenta como gasto: `categorias.cuenta_como_gasto = false`) más un previsto único de cobro por la devolución acordada, con `origen_movimiento_id` apuntando al préstamo. La ganancia es devolución − prestado.
+- La devolución se reconoce por el nombre y por "préstamo". Si el texto también coincide con otro previsto de la misma persona por algo más que el nombre ("gaby me pagó disney"), gana ese. Un "gaby me pagó 15" sin decir "disney" va al préstamo.
+- Los previstos únicos no tienen ventana de anticipación: una devolución adelantada se asocia igual.
+- Eliminar el movimiento del préstamo elimina su devolución.
+- No se registran deudas (cuando te prestan); no se usan por ahora.
+
+## Tipo elegido
+- El atajo y la web preguntan primero Pago, Cobro o Préstamo. Pago y Cobro fijan el tipo del movimiento por encima de lo que diga el texto; sin elección, se deduce como antes.
+- "Confirmar" en un previsto crea el movimiento con lo que falta (editable) y la fecha de hoy.
+
 ## Cuentas y saldo
 - Saldo base conocido (el del banco) en un momento; suman/restan los movimientos en soles de fechas posteriores, o del mismo día registrados después. Vista `saldos_cuentas`.
 - Los registros manuales van a la cuenta predeterminada (Interbank). BBVA existe con saldo 0 hasta integrarla.

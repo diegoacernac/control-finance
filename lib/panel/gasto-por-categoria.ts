@@ -7,10 +7,11 @@ export type GastoDelMes = { totalCentimos: number; categorias: GastoCategoria[] 
 const SIN_CATEGORIA = "Sin categoría";
 const PORCENTAJE_TOTAL = 100;
 
-// Solo egresos en soles: sumar dólares como si fueran soles daría un total
-// falso. Las subcategorías se agrupan en su categoría padre.
+// Solo egresos en soles que son gasto: un préstamo otorgado vuelve, no se
+// consume, y sumar dólares como si fueran soles daría un total falso. Las
+// subcategorías se agrupan en su categoría padre.
 export function calcularGastoDelMes(movimientos: MovimientoPanel[]): GastoDelMes {
-  const egresos = movimientos.filter((m) => m.tipo === "egreso" && m.moneda === "PEN");
+  const egresos = movimientos.filter((m) => m.tipo === "egreso" && m.moneda === "PEN" && m.cuentaComoGasto);
   const totalCentimos = egresos.reduce((suma, m) => suma + m.montoCentimos, 0);
 
   const porCategoria = new Map<string, number>();

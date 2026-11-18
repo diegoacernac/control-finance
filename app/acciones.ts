@@ -7,6 +7,7 @@ import { leerMontoExacto } from "@/lib/ingreso/leer-monto-exacto.ts";
 import { mensajeDeConfirmacion } from "@/lib/movimientos/mensaje-confirmacion.ts";
 import { LARGO_MAXIMO_TEXTO } from "@/lib/movimientos/limites.ts";
 import { registrarMovimientoManual } from "@/lib/movimientos/registrar-movimiento-manual.ts";
+import { leerTipoElegido } from "@/lib/movimientos/tipo-elegido.ts";
 import { parsearDestino } from "@/lib/panel/destino.ts";
 import { crearClienteServidor } from "@/lib/supabase/cliente-servidor.ts";
 
@@ -20,7 +21,10 @@ export async function registrarDesdeWeb(_anterior: ResultadoAccion, formulario: 
     return { ok: false, mensaje: `Escribe el movimiento, hasta ${LARGO_MAXIMO_TEXTO} caracteres.` };
   }
 
-  const resultado = await registrarMovimientoManual(texto);
+  const tipoElegido = leerTipoElegido(formulario.get("tipo"));
+  if (!tipoElegido.valido) return { ok: false, mensaje: "Elige si es pago o cobro." };
+
+  const resultado = await registrarMovimientoManual(texto, tipoElegido.tipo);
   if (!resultado.ok) return { ok: false, mensaje: resultado.error };
 
   revalidatePath("/");
@@ -63,6 +67,30 @@ export async function editarMovimiento(
 
   revalidatePath("/");
   return { ok: true, mensaje: "Cambios guardados." };
+}
+
+export async function confirmarPrevisto(
+  previstoId: number,
+  _anterior: ResultadoAccion,
+  formulario: FormData,
+): Promise<ResultadoAccion> {
+  await exigirPropietario();
+
+  const montoCentimos = leerMontoExacto(String(formulario.get("monto") ?? ""));
+  if (montoCentimos === null) return { ok: false, mensaje: "Escribe solo el monto, por ejemplo 25.90." };
+
+  const fecha = String(formulario.get("fecha") ?? "");
+  if (!esFechaIsoValida(fecha)) return { ok: false, mensaje: "Elige una fecha válida." };
+
+  const { error } = await crearClienteServidor().rpc("confirmar_previsto", {
+    p_previsto_id: idValido(previstoId),
+    p_monto_centimos: montoCentimos,
+    p_fecha: fecha,
+  });
+  if (error) return { ok: false, mensaje: `No se pudo confirmar: ${error.message}` };
+
+  revalidatePath("/");
+  return { ok: true, mensaje: "Confirmado." };
 }
 
 export async function omitirPrevisto(previstoId: number): Promise<void> {

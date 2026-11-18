@@ -5,8 +5,9 @@ import { estaAbierto, restanteCentimos } from "@/lib/panel/proyeccion.ts";
 import type { PrevistoPanel } from "@/lib/panel/tipos.ts";
 import { omitirPrevisto, reabrirPrevisto } from "../acciones.ts";
 import estilos from "../panel.module.css";
+import { ConfirmarPrevisto } from "./ConfirmarPrevisto.tsx";
 
-export function PrevistosDelMes({ grupos }: { grupos: PrevistosAgrupados }) {
+export function PrevistosDelMes({ grupos, hoy }: { grupos: PrevistosAgrupados; hoy: string }) {
   const nadaAbierto = grupos.atrasados.length + grupos.proximos.length + grupos.sinFecha.length === 0;
 
   return (
@@ -17,17 +18,19 @@ export function PrevistosDelMes({ grupos }: { grupos: PrevistosAgrupados }) {
 
       {nadaAbierto && <p className={estilos.vacio}>No queda nada por pagar ni cobrar este mes.</p>}
 
-      <Grupo titulo="Atrasado" previstos={grupos.atrasados} resaltado />
-      <Grupo titulo="Este mes" previstos={grupos.proximos} />
-      <Grupo titulo="Sin fecha" previstos={grupos.sinFecha} />
+      <Grupo titulo="Atrasado" previstos={grupos.atrasados} hoy={hoy} resaltado />
+      <Grupo titulo="Este mes" previstos={grupos.proximos} hoy={hoy} />
+      <Grupo titulo="Sin fecha" previstos={grupos.sinFecha} hoy={hoy} />
 
-      <GrupoPlegable titulo="Más adelante" previstos={grupos.masAdelante} />
-      <GrupoPlegable titulo="Resuelto este mes" previstos={grupos.resueltos} />
+      <GrupoPlegable titulo="Más adelante" previstos={grupos.masAdelante} hoy={hoy} />
+      <GrupoPlegable titulo="Resuelto este mes" previstos={grupos.resueltos} hoy={hoy} />
     </section>
   );
 }
 
-function Grupo({ titulo, previstos, resaltado = false }: { titulo: string; previstos: PrevistoPanel[]; resaltado?: boolean }) {
+type PropsGrupo = { titulo: string; previstos: PrevistoPanel[]; hoy: string; resaltado?: boolean };
+
+function Grupo({ titulo, previstos, hoy, resaltado = false }: PropsGrupo) {
   if (previstos.length === 0) return null;
 
   return (
@@ -35,14 +38,14 @@ function Grupo({ titulo, previstos, resaltado = false }: { titulo: string; previ
       <h3 className={`${estilos.subtitulo} ${resaltado ? estilos.subtituloAtrasado : ""}`}>{titulo}</h3>
       <ul className={estilos.lista}>
         {previstos.map((previsto) => (
-          <FilaPrevisto key={previsto.id} previsto={previsto} />
+          <FilaPrevisto key={previsto.id} previsto={previsto} hoy={hoy} />
         ))}
       </ul>
     </>
   );
 }
 
-function GrupoPlegable({ titulo, previstos }: { titulo: string; previstos: PrevistoPanel[] }) {
+function GrupoPlegable({ titulo, previstos, hoy }: PropsGrupo) {
   if (previstos.length === 0) return null;
 
   return (
@@ -52,14 +55,14 @@ function GrupoPlegable({ titulo, previstos }: { titulo: string; previstos: Previ
       </summary>
       <ul className={estilos.lista}>
         {previstos.map((previsto) => (
-          <FilaPrevisto key={previsto.id} previsto={previsto} />
+          <FilaPrevisto key={previsto.id} previsto={previsto} hoy={hoy} />
         ))}
       </ul>
     </details>
   );
 }
 
-function FilaPrevisto({ previsto }: { previsto: PrevistoPanel }) {
+function FilaPrevisto({ previsto, hoy }: { previsto: PrevistoPanel; hoy: string }) {
   const abierto = estaAbierto(previsto);
   const omitido = previsto.estado === "omitido";
   const centimos = abierto ? restanteCentimos(previsto) : omitido ? previsto.montoEsperadoCentimos : previsto.pagadoCentimos;
@@ -76,6 +79,17 @@ function FilaPrevisto({ previsto }: { previsto: PrevistoPanel }) {
 
       <div className={estilos.filaDetalle}>
         {detalles(previsto).join(" · ")}
+        {abierto && (
+          <details className={estilos.desplegable}>
+            <summary className={estilos.botonTexto}>Confirmar</summary>
+            <ConfirmarPrevisto
+              previstoId={previsto.id}
+              restanteCentimos={centimos}
+              hoy={hoy}
+              esCobro={previsto.tipo === "ingreso"}
+            />
+          </details>
+        )}
         {abierto && (
           <form action={omitirPrevisto.bind(null, previsto.id)} className={estilos.enLinea}>
             <button type="submit" className={estilos.botonTexto}>
@@ -101,6 +115,11 @@ function detalles(previsto: PrevistoPanel): string[] {
   if (previsto.estado === "parcial") {
     const verbo = previsto.tipo === "ingreso" ? "recibido" : "pagado";
     partes.push(`${verbo} ${formatearCifra(previsto.pagadoCentimos)} de ${formatearCifra(previsto.montoEsperadoCentimos)}`);
+  }
+  if (previsto.prestadoCentimos !== null) {
+    const ganancia = previsto.montoEsperadoCentimos - previsto.prestadoCentimos;
+    partes.push(`prestaste ${formatearCifra(previsto.prestadoCentimos)}`);
+    if (ganancia > 0) partes.push(`ganas ${formatearCifra(ganancia)}`);
   }
   if (previsto.estado === "omitido") partes.push("omitido");
   return partes;

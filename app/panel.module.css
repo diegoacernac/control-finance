@@ -591,3 +591,32 @@
     align-self: start;
   }
 }
+
+/* Tipo de registro y confirmación de previstos */
+
+.tiposRegistro {
+  display: inline-flex;
+  border: 1px solid var(--tinta);
+  margin-bottom: 8px;
+}
+
+.tiposRegistro > .opcionTema {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+.tiposRegistro > .opcionTema[aria-checked="true"] {
+  background: var(--tinta);
+  color: var(--papel);
+}
+
+.formularioConfirmar {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  gap: 10px 12px;
+  margin: 6px 0 10px;
+  padding: 12px;
+  border: 1px solid var(--tinta);
+  color: var(--tinta);
+  font-size: 13px;
+}

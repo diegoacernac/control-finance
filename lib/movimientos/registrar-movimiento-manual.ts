@@ -40,8 +40,11 @@ type Clasificacion = {
   eleccion: EleccionPrevisto;
 };
 
-export async function registrarMovimientoManual(texto: string): Promise<ResultadoRegistro> {
-  const parseo = parsearTexto(texto, fechaEnLima(new Date()));
+export async function registrarMovimientoManual(
+  texto: string,
+  tipoElegido: TipoMovimiento | null = null,
+): Promise<ResultadoRegistro> {
+  const parseo = parsearTexto(texto, fechaEnLima(new Date()), tipoElegido);
   if (!parseo.ok) return parseo;
 
   const { movimiento } = parseo;
