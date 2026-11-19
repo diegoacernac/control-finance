@@ -8,7 +8,9 @@ export function mensajeDeConfirmacion(movimiento: MovimientoRegistrado): string 
   const etiquetaTotal = movimiento.tipo === "ingreso" ? "ingresos del mes" : "gastos del mes";
   const total = formatearMonto(movimiento.totalMesCentimos, movimiento.moneda);
 
-  const partes = [categoria, monto, describirPrevisto(movimiento), `${etiquetaTotal}: ${total}`];
+  // El correo del banco llegó antes: no se creó otro movimiento.
+  const delCorreo = movimiento.unidoConCorreo ? "ya estaba por el correo del banco" : null;
+  const partes = [categoria, monto, describirPrevisto(movimiento), delCorreo, `${etiquetaTotal}: ${total}`];
   return partes.filter(Boolean).join(" · ");
 }
 

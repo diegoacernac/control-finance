@@ -8,7 +8,7 @@ import { elegirPrevisto, type EleccionPrevisto } from "../previstos/elegir-previ
 import { crearClienteServidor } from "../supabase/cliente-servidor.ts";
 import type { Moneda, TipoMovimiento } from "./tipos.ts";
 
-export type EstadoPrevisto ="pendiente" | "parcial" | "confirmado" | "omitido";
+export type EstadoPrevisto = "pendiente" | "parcial" | "confirmado" | "omitido";
 
 export type MovimientoRegistrado = {
   id: number;
@@ -23,6 +23,7 @@ export type MovimientoRegistrado = {
   totalMesCentimos: number;
   previsto: { nombre: string; estado: EstadoPrevisto; restanteCentimos: number } | null;
   previstosPosibles: string[];
+  unidoConCorreo: boolean;
 };
 
 export type ResultadoRegistro = { ok: true; movimiento: MovimientoRegistrado } | { ok: false; error: string };
@@ -32,9 +33,10 @@ type FilaRegistro = {
   total_mes_centimos: number;
   previsto_estado: EstadoPrevisto | null;
   previsto_restante_centimos: number | null;
+  unido_con_correo: boolean;
 };
 
-type Clasificacion = {
+export type Clasificacion = {
   categoria: { id: number; nombre: string } | null;
   origen: "regla" | "fijo" | null;
   eleccion: EleccionPrevisto;
@@ -94,15 +96,16 @@ export async function registrarMovimientoManual(
             }
           : null,
       previstosPosibles: clasificacion.eleccion.resultado === "ambiguo" ? clasificacion.eleccion.nombres : [],
+      unidoConCorreo: data.unido_con_correo,
     },
   };
 }
 
 // Si el texto corresponde a un fijo o previsto, su categoría manda sobre la
 // regla. Los fijos están en soles, así que un monto en dólares no se asocia.
-async function clasificar(
+export async function clasificar(
   supabase: SupabaseClient,
-  movimiento: MovimientoParseado,
+  movimiento: Pick<MovimientoParseado, "descripcion" | "moneda" | "fecha">,
   categorizacion: Categorizacion,
 ): Promise<Clasificacion> {
   const porRegla: Clasificacion = {

@@ -13,7 +13,7 @@ Registro de finanzas personales con una frase: `taxi oficina 12.50`, `ayer juan 
    ```bash
    npm run dev
    ```
-4. **Vercel.** Carga las mismas tres variables en Project Settings → Environment Variables.
+4. **Vercel.** Carga las mismas variables en Project Settings → Environment Variables.
 
 ## Web
 
@@ -23,12 +23,22 @@ La página principal muestra con cuánto cierras el mes, el calendario de pagos 
 
 Para activarla:
 
-1. Ejecuta las migraciones `20261112000004_vistas_y_acciones_web.sql`, `20261112000005_editar_movimiento.sql` y `20261118000006_prestamos_y_confirmar.sql`.
+1. Ejecuta las migraciones `20261112000004_vistas_y_acciones_web.sql`, `20261112000005_editar_movimiento.sql`, `20261118000006_prestamos_y_confirmar.sql`, `20261119000007_correos_banco.sql` y `20261119000008_planificacion.sql`, en ese orden.
 2. Agrega `SUPABASE_PUBLISHABLE_KEY` y `CORREO_PROPIETARIO` en `.env.local` y en Vercel.
 3. En Supabase → Authentication → URL Configuration, pon tu URL de Vercel como **Site URL** y agrega en **Redirect URLs** `https://<tu-app>.vercel.app/auth/confirmar` y `http://localhost:3000/auth/confirmar`.
 4. Después de entrar por primera vez, desactiva "Allow new users to sign up" en Supabase → Authentication → Sign In / Providers. Así nadie más puede crear una cuenta en tu proyecto.
 
 El enlace del correo debe abrirse en el mismo navegador donde lo pediste.
+
+### Planificar
+
+En `/planificar` (enlace arriba del panel) ves los próximos meses: con cuánto empiezas, lo que entra, fijos y cuotas, únicos, gasto variable, lo que queda libre, el ahorro y con cuánto cierras. Cada mes parte del cierre del anterior.
+
+- **Rango:** mes siguiente, 3 o 6 meses, o fechas libres hasta 12 meses. **Filtro:** todo, gastos o ingresos.
+- **Omitir** un pago futuro (por ejemplo, cancelar HBO desde marzo) recalcula los meses siguientes.
+- **Planeado:** compras, viajes o ingresos que aún no pasan. Al registrar el gasto real con su nombre ("viaje cusco pasajes 800") se descuenta del planeado.
+- **Ahorro mensual:** un fijo en la categoría Ahorro. Resta del saldo pero no cuenta como gasto. Confírmalo cuando muevas la plata a la alcancía.
+- **Gasto variable:** lo que esperas gastar al mes fuera de los fijos (por defecto S/ 450). En el mes actual se resta solo lo que falta.
 
 ### Entrar con Google
 
@@ -38,11 +48,34 @@ El enlace del correo debe abrirse en el mismo navegador donde lo pediste.
 
 Solo entra la cuenta de Google cuyo correo sea `CORREO_PROPIETARIO`.
 
+## Correos de Interbank
+
+Los consumos con tarjeta y las transferencias (Plin, Yape) que avisa Interbank por correo se registran solos. Si ya los habías anotado, el correo se une a tu registro en vez de duplicarlo, y al revés: si dictas algo que ya llegó por correo, se completa el del correo con tu descripción.
+
+Un script de Google Apps Script revisa tu Gmail cada 5 minutos y envía los correos nuevos a `/api/correos`. Solo tiene permiso de lectura sobre Gmail.
+
+1. Genera otro token con `openssl rand -hex 32` y guárdalo como `CORREOS_API_TOKEN` en `.env.local` y en Vercel. Despliega.
+2. Entra a [script.google.com](https://script.google.com) con tu cuenta de Gmail y crea un proyecto nuevo.
+3. En Configuración del proyecto (engranaje), activa **Mostrar el archivo de manifiesto "appsscript.json"**.
+4. En el editor:
+   - Reemplaza el contenido de `appsscript.json` con el de [docs/apps-script/appsscript.json](docs/apps-script/appsscript.json). Cambia `https://TU-APP.vercel.app/` por tu URL: el script solo podrá llamar a esa dirección.
+   - Reemplaza `Código.gs` con [docs/apps-script/correos.gs](docs/apps-script/correos.gs).
+5. En Configuración del proyecto → **Propiedades del script**, agrega:
+   - `URL_API_CORREOS` = `https://<tu-app>.vercel.app/api/correos`
+   - `CORREOS_API_TOKEN` = el token del paso 1.
+   - Opcional: `CONSULTA_GMAIL`, si tus correos de Interbank no coinciden con `from:interbank`.
+6. Ejecuta **probarCorreos** y acepta los permisos. En el registro de ejecución verás cómo se interpretaron tus últimos 5 correos, sin guardar nada.
+7. Si se ven bien, ejecuta **instalarDisparador** una vez. Desde ahí corre cada 5 minutos. La primera vez revisa los últimos 2 días.
+
+Si un correo parece una operación pero no se entiende, el script falla a propósito y Google te avisa por correo: ese movimiento hay que anotarlo a mano. Los cobros en dólares no llegan por correo de Interbank; Claude y GPT se siguen confirmando a mano.
+
 ## API
 
-Todas con la cabecera `Authorization: Bearer <INGRESO_API_TOKEN>`.
+Con la cabecera `Authorization: Bearer <INGRESO_API_TOKEN>`, salvo `/api/correos`.
 
 **`POST /api/movimientos`**: `{"texto": "taxi oficina 12.50", "tipo": "pago"}`. `tipo` es opcional: `"pago"` o `"cobro"`. Sin tipo, se deduce del texto.
+
+**`POST /api/correos`** (cabecera con `CORREOS_API_TOKEN`): lo usa el script de Gmail. `{"referencia", "remitente", "recibidoEn", "html" o "texto", "prueba"?}`. Responde 200 con `resultado` igual a `creado`, `unido`, `duplicado`, `ignorado` o `prueba`. Responde 422 si el correo parece una operación pero no se entendió.
 
 **`POST /api/prestamos`**: `{"quien": "Gaby 120", "devolucion": "130", "cuando": "2 de diciembre"}`, las tres respuestas tal cual se dictan.
 

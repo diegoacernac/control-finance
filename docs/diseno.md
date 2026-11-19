@@ -34,6 +34,23 @@ Registrar un movimiento debe costar una frase. El texto se convierte en monto, m
 - El atajo y la web preguntan primero Pago, Cobro o Préstamo. Pago y Cobro fijan el tipo del movimiento por encima de lo que diga el texto; sin elección, se deduce como antes.
 - "Confirmar" en un previsto crea el movimiento con lo que falta (editable) y la fecha de hoy.
 
+## Correos del banco
+- Gmail → Apps Script (solo lectura, cada 5 min, cursor por fecha) → `POST /api/correos` con su propio token. El HTML se pasa a líneas y se leen pares etiqueta → valor (`lib/correos/leer-campos.ts`), sin depender del orden.
+- Se reconocen consumos con tarjeta (hay "Comercio") y transferencias enviadas (hay "Destinatario"). Lo demás se ignora; si parece operación pero falta el monto, es error (422) para no perderlo.
+- Se guarda un resumen como fuente (`correo_banco`, referencia = id de Gmail), no el correo: trae números de cuenta.
+- Conciliación (`registrar_correo_banco`): mismo tipo, moneda y monto, fecha ±2 días, sin correo todavía y sin categorías raíz distintas → se adjunta. Varios iguales: da lo mismo a cuál (el total no cambia). Ninguno → movimiento nuevo con reglas y previstos ("NETFLIX.COM" salda Netflix).
+- Al revés (`registrar_movimiento_manual`): si lo dictado coincide con un movimiento que solo vino por correo, se completa ese con tu descripción, categoría o previsto.
+- Riesgo aceptado: un gasto en efectivo y un Plin distinto del mismo monto y días cercanos se unirían. La regla de categorías en conflicto lo reduce.
+- Los cobros en dólares (Claude, GPT) no tienen correo de Interbank: se confirman a mano.
+
+## Planificar
+- Proyección mes a mes desde el actual: el primer mes parte del saldo de hoy y suma lo que falta (incluye atrasados); cada mes siguiente parte del cierre del anterior. Lo omitido y lo sin fecha no cuenta.
+- Libre = entra − fijos − únicos − gasto variable. Cierre = inicio + libre − ahorro.
+- Gasto variable: monto mensual en `planificacion`. En el mes actual se resta lo que falta: estimado − egresos en soles sin previsto que cuentan como gasto.
+- Ahorro: un fijo en la categoría Ahorro (`cuenta_como_gasto = false`), configurado con `configurar_ahorro`, que rehace los previstos pendientes desde hoy.
+- Planeado: previsto único con `planeado = true` y el nombre completo como patrón. Se quita solo si no tiene pagos.
+- Planificar genera previstos de fijos hasta el fin del rango (máximo 12 meses). En el panel, "Más adelante" muestra los únicos de cualquier fecha y los fijos solo hasta el mes siguiente.
+
 ## Cuentas y saldo
 - Saldo base conocido (el del banco) en un momento; suman/restan los movimientos en soles de fechas posteriores, o del mismo día registrados después. Vista `saldos_cuentas`.
 - Los registros manuales van a la cuenta predeterminada (Interbank). BBVA existe con saldo 0 hasta integrarla.
@@ -50,7 +67,7 @@ Registrar un movimiento debe costar una frase. El texto se convierte en monto, m
 ## Fases
 1. **Base** (hecha): esquema, parser, reglas, `POST /api/movimientos` con token, atajo de iOS.
 2. **Fijos** (hecha): fijos, previstos (incluidos únicos), cuentas con saldo.
-3. **Correos**: Gmail (filtro + etiqueta) → Apps Script cada 5 min → `POST /api/correos`. Parsing en TypeScript. Conciliación: misma moneda y monto en una ventana de tiempo → adjuntar fuente; ninguno → movimiento nuevo; varios → bandeja "por conciliar".
+3. **Correos** (hecha, Interbank): consumos con tarjeta y transferencias. Ver "Correos del banco".
 4. **Web** (primera versión hecha): login, dashboard, omitir/reabrir previstos, bandeja por revisar, eliminar registros.
 5. **Extras**: categorización con IA para lo que no coincide, servidor MCP para registrar y consultar desde el chat.
 
@@ -61,4 +78,4 @@ Registrar un movimiento debe costar una frase. El texto se convierte en monto, m
 - **Uber**: el monto real es el de "Pagos"/"Total" (ya con créditos), no la tarifa.
 - **Rappi**: "Total pagado S/.20.54"; el cargo a la tarjeta fue ~1 h después del pedido. La ventana de conciliación debe tolerar horas, no minutos.
 - Formatos de monto: `S/ 11.00`, `S/. 19.30`, `S/.20.54`.
-- **Anthropic (Claude Pro)**: el recibo llega a Outlook, no a Gmail, en US$ 20.00. El monto en soles que importa es el que debita Interbank; falta ver ese correo de consumo en dólares.
+- **Anthropic (Claude Pro)**: el recibo llega a Outlook, no a Gmail, en US$ 20.00. Interbank no envía correo de los cobros en dólares: se confirman a mano.

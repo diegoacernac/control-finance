@@ -122,7 +122,8 @@ async function ejecutar(funcion: string, parametros: Record<string, number | boo
   const { error } = await crearClienteServidor().rpc(funcion, parametros);
   if (error) throw new Error(`No se pudo completar la acción: ${error.message}`);
 
-  revalidatePath("/");
+  // Omitir y reabrir también se usan desde Planificar.
+  revalidatePath("/", "layout");
 }
 
 // Los argumentos de una acción llegan del navegador: no se confía en su tipo.

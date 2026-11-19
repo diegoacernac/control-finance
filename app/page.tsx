@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { connection } from "next/server";
 import { exigirPropietario } from "@/lib/auth/propietario.ts";
 import { fechaLarga, nombreDelMes } from "@/lib/fechas/formato.ts";
@@ -38,6 +39,9 @@ export default async function PaginaPanel() {
           <p className={estilos.fechaHoy}>{fechaLarga(hoy)}</p>
         </div>
         <div className={estilos.acciones}>
+          <Link href="/planificar" className={estilos.botonTexto}>
+            Planificar
+          </Link>
           <SelectorTema actual={await leerTema()} />
           <form action={cerrarSesion}>
             <button type="submit" className={estilos.botonTexto}>

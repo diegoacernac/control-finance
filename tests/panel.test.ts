@@ -15,6 +15,7 @@ let siguienteId = 1;
 function previsto(campos: Partial<PrevistoPanel> & Pick<PrevistoPanel, "nombre">): PrevistoPanel {
   return {
     id: siguienteId++,
+    fijoId: 1,
     tipo: "egreso",
     categoriaNombre: "Plataformas",
     persona: null,
@@ -41,6 +42,7 @@ function movimiento(campos: Partial<MovimientoPanel>): MovimientoPanel {
     categoriaRaiz: "Comida",
     previstoNombre: null,
     cuentaComoGasto: true,
+    conCorreo: false,
     ...campos,
   };
 }
@@ -48,7 +50,8 @@ function movimiento(campos: Partial<MovimientoPanel>): MovimientoPanel {
 const SUELDO = previsto({ nombre: "Sueldo", tipo: "ingreso", fechaEsperada: "2026-11-05", estado: "parcial", montoEsperadoCentimos: 280000, pagadoCentimos: 100000 });
 const POZO = previsto({ nombre: "Pozo junta", tipo: "ingreso", fechaEsperada: "2026-11-15", montoEsperadoCentimos: 105000 });
 const MADRE = previsto({ nombre: "Madre", tipo: "ingreso", fechaEsperada: null, estado: "parcial", montoEsperadoCentimos: 7500, pagadoCentimos: 1500 });
-const BONO = previsto({ nombre: "Bono", tipo: "ingreso", fechaEsperada: "2027-01-15", montoEsperadoCentimos: 70000 });
+const BONO = previsto({ nombre: "Bono", fijoId: null, tipo: "ingreso", fechaEsperada: "2027-01-15", montoEsperadoCentimos: 70000 });
+const NETFLIX_FEBRERO = previsto({ nombre: "Netflix", fechaEsperada: "2027-02-15" });
 const HBO = previsto({ nombre: "HBO", fechaEsperada: "2026-11-17", montoEsperadoCentimos: 2690 });
 const ALQUILER = previsto({ nombre: "Alquiler", fechaEsperada: "2026-11-01", montoEsperadoCentimos: 40000 });
 const DEUDA_OCTUBRE = previsto({ nombre: "Internet", fechaEsperada: "2026-10-10", montoEsperadoCentimos: 3500 });
@@ -57,7 +60,7 @@ const JUNTA_OMITIDA = previsto({ nombre: "Junta", fechaEsperada: "2026-11-15", e
 const PRIME_PAGADO = previsto({ nombre: "Prime", fechaEsperada: "2026-11-14", estado: "confirmado", montoEsperadoCentimos: 2590, pagadoCentimos: 2590 });
 const UBER = previsto({ nombre: "Uber Plus", fechaEsperada: "2026-11-14", montoEsperadoCentimos: 1990 });
 
-const TODOS = [SUELDO, POZO, MADRE, BONO, HBO, ALQUILER, DEUDA_OCTUBRE, RIPLEY, JUNTA_OMITIDA, PRIME_PAGADO, UBER];
+const TODOS = [SUELDO, POZO, MADRE, BONO, NETFLIX_FEBRERO, HBO, ALQUILER, DEUDA_OCTUBRE, RIPLEY, JUNTA_OMITIDA, PRIME_PAGADO, UBER];
 
 describe("calcularProyeccion", () => {
   const proyeccion = calcularProyeccion(36047, TODOS, FIN_DE_MES);
@@ -92,6 +95,7 @@ describe("agruparPrevistos", () => {
     assert.deepEqual(nombres(grupos.proximos), ["Uber Plus", "Pozo junta", "HBO"]);
   });
 
+  // Netflix de febrero (un fijo a tres meses) se ve en Planificar, no aquí.
   it("sin fecha y más adelante van aparte", () => {
     assert.deepEqual(nombres(grupos.sinFecha), ["Madre"]);
     assert.deepEqual(nombres(grupos.masAdelante), ["Bono"]);

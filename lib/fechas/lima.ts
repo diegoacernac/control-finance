@@ -32,6 +32,12 @@ export function finDeMes(fechaIso: string): string {
   return new Date(Date.UTC(anio, mes, 0)).toISOString().slice(0, 10);
 }
 
+// Primer día del mes que está `meses` después (o antes, si es negativo).
+export function mesDespues(fechaIso: string, meses: number): string {
+  const [anio, mes] = fechaIso.split("-").map(Number);
+  return new Date(Date.UTC(anio, mes - 1 + meses, 1)).toISOString().slice(0, 10);
+}
+
 export function diaDeSemana(fechaIso: string): number {
   return new Date(`${fechaIso}T00:00:00Z`).getUTCDay();
 }

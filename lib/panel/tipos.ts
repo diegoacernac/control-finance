@@ -3,6 +3,7 @@ import type { Moneda, TipoMovimiento } from "../movimientos/tipos.ts";
 
 export type PrevistoPanel = {
   id: number;
+  fijoId: number | null;
   nombre: string;
   tipo: TipoMovimiento;
   categoriaNombre: string;
@@ -27,6 +28,7 @@ export type MovimientoPanel = {
   categoriaRaiz: string | null;
   previstoNombre: string | null;
   cuentaComoGasto: boolean;
+  conCorreo: boolean;
 };
 
 export type SaldoCuenta = { id: number; nombre: string; saldoCentimos: number };

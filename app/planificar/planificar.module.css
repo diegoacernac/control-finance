@@ -1,0 +1,242 @@
+.pagina {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 16px 16px 72px;
+  display: grid;
+  gap: 32px;
+}
+
+.vistaGeneral,
+.columnaPrincipal,
+.columnaLateral {
+  display: grid;
+  gap: 36px;
+  align-content: start;
+  min-width: 0;
+}
+
+.titulo {
+  font-family: var(--fuente-titulo), serif;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-bottom: 10px;
+}
+
+.ayuda {
+  color: var(--tenue);
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+/* Rango y filtro */
+
+.selector {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px 20px;
+  margin-top: -12px;
+}
+
+.segmentos {
+  display: inline-flex;
+  border: 1px solid var(--tinta);
+}
+
+.segmento {
+  color: var(--tenue);
+  font-size: 13px;
+  padding: 6px 12px;
+  text-decoration: none;
+}
+
+.segmento + .segmento {
+  border-left: 1px solid var(--tinta);
+}
+
+.segmento[aria-current="page"] {
+  background: var(--tinta);
+  color: var(--papel);
+}
+
+.fechas[open] {
+  flex-basis: 100%;
+}
+
+.formularioFechas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 10px 12px;
+  margin-top: 6px;
+}
+
+.formularioFechas > div {
+  flex: 1 1 150px;
+}
+
+/* Tabla mes a mes: una fila por mes en escritorio, un bloque por mes en el celular. */
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.tabla th,
+.tabla td {
+  padding: 9px 0 8px 12px;
+  text-align: right;
+  white-space: nowrap;
+  border-bottom: 1px dotted var(--regla);
+}
+
+.tabla thead th {
+  color: var(--tenue);
+  font-size: 12px;
+  font-weight: 500;
+  border-bottom: 1.5px solid var(--tinta);
+  white-space: normal;
+  vertical-align: bottom;
+}
+
+.tabla th:first-child {
+  text-align: left;
+  padding-left: 0;
+}
+
+.tabla tbody th {
+  font-family: var(--fuente-titulo), serif;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.tabla tbody th::first-letter {
+  text-transform: uppercase;
+}
+
+.notaMes {
+  display: block;
+  font-family: var(--fuente-datos), monospace;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--tenue);
+}
+
+.libre {
+  color: var(--ingreso);
+  font-weight: 500;
+}
+
+.negativo {
+  color: var(--egreso);
+  font-weight: 500;
+}
+
+.cierre {
+  font-weight: 600;
+}
+
+.leyendaTabla {
+  color: var(--tenue);
+  font-size: 12px;
+  margin-top: 8px;
+}
+
+/* Debajo de ~820 px las nueve columnas no caben. */
+@media (max-width: 819px) {
+  .tabla thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .tabla,
+  .tabla tbody,
+  .tabla tr {
+    display: block;
+  }
+
+  .tabla tr {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 16px;
+    padding: 12px 0 14px;
+    border-bottom: 1.5px solid var(--tinta);
+  }
+
+  .tabla tbody th {
+    grid-column: 1 / -1;
+    border-bottom: 0;
+    padding: 0 0 6px;
+    font-size: 19px;
+  }
+
+  .tabla td {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 5px 0;
+  }
+
+  .tabla td::before {
+    content: attr(data-etiqueta);
+    color: var(--tenue);
+    font-size: 12px;
+  }
+
+  .tabla td.cierre {
+    grid-column: 1 / -1;
+    border-bottom: 0;
+    font-size: 17px;
+  }
+}
+
+/* Listas laterales */
+
+.totalesGrupo {
+  float: right;
+  font-variant-numeric: tabular-nums;
+  white-space: pre;
+}
+
+.filaSimple {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px dotted var(--regla);
+}
+
+.detalleSimple {
+  display: block;
+  color: var(--tenue);
+  font-size: 12px;
+}
+
+@media (min-width: 1000px) {
+  .pagina {
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
+    column-gap: 56px;
+    padding-top: 28px;
+  }
+
+  .pagina > header,
+  .selector,
+  .vistaGeneral {
+    grid-column: 1 / -1;
+  }
+}
+
+/* El resumen al lado de la tabla solo cuando la tabla entra completa. */
+@media (min-width: 1200px) {
+  .vistaGeneral {
+    grid-template-columns: 320px minmax(0, 1fr);
+    column-gap: 40px;
+    align-items: start;
+  }
+}

@@ -18,6 +18,7 @@ type FilaSaldo = { id: number; nombre: string; saldo_centimos: number };
 
 type FilaPrevisto = {
   id: number;
+  fijo_id: number | null;
   nombre: string;
   tipo: TipoMovimiento;
   categoria_nombre: string;
@@ -42,14 +43,15 @@ type FilaMovimiento = {
   categoria_raiz: string | null;
   previsto_nombre: string | null;
   cuenta_como_gasto: boolean;
+  con_correo: boolean;
 };
 
 type FilaCategoria = { id: number; tipo: TipoMovimiento; nombre_completo: string };
 
 const COLUMNAS_PREVISTO =
-  "id, nombre, tipo, categoria_nombre, persona, fecha_esperada, numero_cuota, cuotas_total, estado, monto_esperado_centimos, pagado_centimos, prestado_centimos";
+  "id, fijo_id, nombre, tipo, categoria_nombre, persona, fecha_esperada, numero_cuota, cuotas_total, estado, monto_esperado_centimos, pagado_centimos, prestado_centimos";
 const COLUMNAS_MOVIMIENTO =
-  "id, tipo, monto_centimos, moneda, fecha, descripcion, categoria_nombre, categoria_raiz, previsto_nombre, cuenta_como_gasto";
+  "id, tipo, monto_centimos, moneda, fecha, descripcion, categoria_nombre, categoria_raiz, previsto_nombre, cuenta_como_gasto, con_correo";
 const CANTIDAD_ULTIMOS_MOVIMIENTOS = 10;
 
 export async function cargarPanel(hoy: string): Promise<DatosPanel> {
@@ -118,6 +120,7 @@ function errorDeCarga(que: string, error: PostgrestError): Error {
 function aPrevisto(fila: FilaPrevisto): PrevistoPanel {
   return {
     id: fila.id,
+    fijoId: fila.fijo_id,
     nombre: fila.nombre,
     tipo: fila.tipo,
     categoriaNombre: fila.categoria_nombre,
@@ -144,5 +147,6 @@ function aMovimiento(fila: FilaMovimiento): MovimientoPanel {
     categoriaRaiz: fila.categoria_raiz,
     previstoNombre: fila.previsto_nombre,
     cuentaComoGasto: fila.cuenta_como_gasto,
+    conCorreo: fila.con_correo,
   };
 }

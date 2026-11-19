@@ -32,6 +32,7 @@ export function UltimosMovimientos({ movimientos, previstosAbiertos, categorias 
 
               <div className={estilos.filaDetalle}>
                 {movimiento.previstoNombre ?? movimiento.categoriaNombre ?? "Sin categoría"}
+                {movimiento.conCorreo && <span>con correo del banco</span>}
                 <details className={estilos.desplegable}>
                   <summary className={estilos.botonTexto}>Editar</summary>
                   <EditarMovimiento movimiento={movimiento} previstosAbiertos={previstosAbiertos} categorias={categorias} />

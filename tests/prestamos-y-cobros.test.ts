@@ -164,7 +164,7 @@ describe("gasto del mes sin préstamos otorgados", () => {
   it("el préstamo no cuenta como gasto", () => {
     const movimiento = (campos: Partial<MovimientoPanel>): MovimientoPanel => ({
       id: 1, tipo: "egreso", montoCentimos: 1000, moneda: "PEN", fecha: HOY, descripcion: "x",
-      categoriaNombre: "Comida", categoriaRaiz: "Comida", previstoNombre: null, cuentaComoGasto: true, ...campos,
+      categoriaNombre: "Comida", categoriaRaiz: "Comida", previstoNombre: null, cuentaComoGasto: true, conCorreo: false, ...campos,
     });
     const gasto = calcularGastoDelMes([
       movimiento({ montoCentimos: 1800 }),
