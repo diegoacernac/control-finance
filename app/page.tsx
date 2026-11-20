@@ -22,15 +22,18 @@ import estilos from "./panel.module.css";
 import { BotonEnviar } from "./_componentes/BotonEnviar.tsx";
 
 export default async function PaginaPanel() {
+  await connection();
   await exigirPropietario();
 
   // "Hoy" cambia en cada visita: se calcula al momento del pedido, nunca de antemano.
-  await connection();
   const hoy = fechaEnLima(new Date());
   const fin = finDeMes(hoy);
   const datos = await cargarPanel(hoy);
   const saldoTotal = datos.saldos.reduce((suma, cuenta) => suma + cuenta.saldoCentimos, 0);
   const previstosAbiertos = datos.previstos.filter(estaAbierto);
+
+  const grupos = agruparPrevistos(datos.previstos, hoy, fin);
+  const vencenHoy = grupos.proximos.filter((p) => p.fechaEsperada === hoy);
 
   return (
     <main className={estilos.panel}>
@@ -40,6 +43,7 @@ export default async function PaginaPanel() {
           <p className={estilos.fechaHoy}>{fechaLarga(hoy)}</p>
         </div>
         <div className={estilos.acciones}>
+          <Link href="/movimientos" className={estilos.botonTexto}>Movimientos</Link>
           <Link href="/planificar" className={estilos.botonTexto}>
             Planificar
           </Link>
@@ -60,6 +64,17 @@ export default async function PaginaPanel() {
           proyeccion={calcularProyeccion(saldoTotal, datos.previstos, fin)}
           saldos={datos.saldos}
         />
+        {(datos.porRevisar.length > 0 || grupos.atrasados.length > 0 || vencenHoy.length > 0) && (
+          <nav aria-label="Pendientes" className={estilos.atajosPendientes}>
+            {datos.porRevisar.length > 0 && <a href="#titulo-revisar">{datos.porRevisar.length} por revisar</a>}
+            {grupos.atrasados.length > 0 && (
+              <a href={`#previsto-${grupos.atrasados[0].id}`}>{grupos.atrasados.length} con atraso</a>
+            )}
+            {vencenHoy.length > 0 && (
+              <a href={`#previsto-${vencenHoy[0].id}`}>Vence hoy ({vencenHoy.length})</a>
+            )}
+          </nav>
+        )}
         <CalendarioMes calendario={construirCalendario(datos.previstos, hoy)} />
       </div>
 
@@ -69,7 +84,7 @@ export default async function PaginaPanel() {
           previstosAbiertos={previstosAbiertos}
           categorias={datos.categorias}
         />
-        <PrevistosDelMes grupos={agruparPrevistos(datos.previstos, hoy, fin)} hoy={hoy} />
+        <PrevistosDelMes grupos={grupos} hoy={hoy} />
         <GastoPorCategoria gasto={calcularGastoDelMes(datos.movimientosDelMes)} />
         <UltimosMovimientos
           movimientos={datos.ultimosMovimientos}

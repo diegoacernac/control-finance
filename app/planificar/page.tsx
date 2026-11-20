@@ -21,9 +21,9 @@ import estilos from "./planificar.module.css";
 export const instant = false;
 
 export default async function PaginaPlanificar({ searchParams }: PageProps<"/planificar">) {
+  await connection();
   await exigirPropietario();
 
-  await connection();
   const hoy = fechaEnLima(new Date());
   const rango = leerRango(await searchParams, hoy);
   // La proyección siempre cubre el mes actual: el siguiente parte de su cierre.

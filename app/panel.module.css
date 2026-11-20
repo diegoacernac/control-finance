@@ -630,3 +630,34 @@
   color: var(--tinta);
   font-size: 13px;
 }
+
+.cabeceraSeccion {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.atajosPendientes {
+  display: none;
+}
+
+@media (max-width: 899px) {
+  .atajosPendientes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+    margin-top: -24px;
+    border-bottom: 1px solid var(--regla);
+  }
+
+  .atajosPendientes a {
+    color: var(--tinta);
+    padding: 12px 0;
+    text-underline-offset: 3px;
+  }
+
+  .tiposRegistro > .opcionTema {
+    min-height: 44px;
+  }
+}

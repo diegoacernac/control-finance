@@ -15,8 +15,8 @@ const OPCIONES: { valor: TipoRegistro; etiqueta: string }[] = [
 ];
 
 const EJEMPLO: Record<Exclude<TipoRegistro, "prestamo">, string> = {
-  pago: "taxi oficina 12.50 · hbo 26.90",
-  cobro: "mi madre me pagó 15 · gaby 130",
+  pago: "taxi oficina 12.50",
+  cobro: "mi madre me pagó 15",
 };
 
 export function RegistroRapido({ hoy }: { hoy: string }) {

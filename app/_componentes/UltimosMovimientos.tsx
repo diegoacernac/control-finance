@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { diaYMes } from "@/lib/fechas/formato.ts";
 import { formatearMonto } from "@/lib/movimientos/formato-monto.ts";
 import type { MovimientoPanel, OpcionCategoria, PrevistoPanel } from "@/lib/panel/tipos.ts";
@@ -15,9 +16,10 @@ type Props = {
 export function UltimosMovimientos({ movimientos, previstosAbiertos, categorias }: Props) {
   return (
     <section aria-labelledby="titulo-ultimos">
-      <h2 id="titulo-ultimos" className={estilos.titulo}>
-        Últimos registros
-      </h2>
+      <div className={estilos.cabeceraSeccion}>
+        <h2 id="titulo-ultimos" className={estilos.titulo}>Últimos registros</h2>
+        <Link href="/movimientos" className={estilos.botonTexto}>Ver todos</Link>
+      </div>
 
       {movimientos.length === 0 ? (
         <p className={estilos.vacio}>Dicta tu primer movimiento desde el atajo o anótalo arriba.</p>

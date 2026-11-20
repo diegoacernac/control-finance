@@ -11,7 +11,7 @@ export function ResumenMes({ mes, proyeccion, saldos }: Props) {
   return (
     <section className={estilos.resumen} aria-labelledby="titulo-resumen">
       <h2 id="titulo-resumen" className={estilos.resumenEtiqueta}>
-        Cierras {mes} con
+        Saldo tras los cobros y pagos previstos de {mes}
       </h2>
       <p className={estilos.resumenCifra}>
         {cierre.negativo && <span aria-label="menos">−</span>}

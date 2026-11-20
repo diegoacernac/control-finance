@@ -14,7 +14,7 @@ export function ResumenPlan({ meses }: { meses: MesProyectado[] }) {
   return (
     <section className={estilosPanel.resumen} aria-labelledby="titulo-plan">
       <h2 id="titulo-plan" className={estilosPanel.resumenEtiqueta}>
-        Cierras {nombreDelMes(ultimo.mes)} con
+        Cierre estimado de {nombreDelMes(ultimo.mes)} con gasto variable
       </h2>
       <p className={estilosPanel.resumenCifra}>
         {cierre.negativo && <span aria-label="menos">−</span>}

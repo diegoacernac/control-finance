@@ -70,7 +70,7 @@ function FilaPrevisto({ previsto, hoy }: { previsto: PrevistoPanel; hoy: string 
   const claseMonto = omitido ? estilos.tachado : previsto.tipo === "ingreso" ? estilos.ingreso : estilos.egreso;
 
   return (
-    <li className={estilos.fila}>
+    <li id={`previsto-${previsto.id}`} className={estilos.fila}>
       <span className={estilos.filaFecha}>{previsto.fechaEsperada ? diaYMes(previsto.fechaEsperada) : "—"}</span>
       <span className={omitido ? estilos.tachado : estilos.filaNombre}>
         {previsto.nombre}
