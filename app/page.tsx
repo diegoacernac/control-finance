@@ -2,7 +2,7 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { exigirPropietario } from "@/lib/auth/propietario.ts";
 import { fechaLarga, nombreDelMes } from "@/lib/fechas/formato.ts";
-import { fechaEnLima, finDeMes } from "@/lib/fechas/lima.ts";
+import { fechaEnLima, finDeMes, sumarDias } from "@/lib/fechas/lima.ts";
 import { agruparPrevistos } from "@/lib/panel/agrupar-previstos.ts";
 import { construirCalendario } from "@/lib/panel/calendario.ts";
 import { cargarPanel } from "@/lib/panel/cargar-panel.ts";
@@ -28,6 +28,8 @@ export default async function PaginaPanel() {
   // "Hoy" cambia en cada visita: se calcula al momento del pedido, nunca de antemano.
   const hoy = fechaEnLima(new Date());
   const fin = finDeMes(hoy);
+  const finSemana = sumarDias(hoy, 7);
+  const limiteAgenda = finSemana > fin ? finSemana : fin;
   const datos = await cargarPanel(hoy);
   const saldoTotal = datos.saldos.reduce((suma, cuenta) => suma + cuenta.saldoCentimos, 0);
   const previstosAbiertos = datos.previstos.filter(estaAbierto);
@@ -58,7 +60,7 @@ export default async function PaginaPanel() {
 
       <RegistroRapido hoy={hoy} />
 
-      <div className={`${estilos.columna} ${estilos.columnaFija}`}>
+      <div className={estilos.columna}>
         <ResumenMes
           mes={nombreDelMes(hoy)}
           proyeccion={calcularProyeccion(saldoTotal, datos.previstos, fin)}
@@ -75,7 +77,12 @@ export default async function PaginaPanel() {
             )}
           </nav>
         )}
-        <CalendarioMes calendario={construirCalendario(datos.previstos, hoy)} />
+        <CalendarioMes
+          key={hoy}
+          calendario={construirCalendario(datos.previstos, hoy)}
+          hoy={hoy}
+          previstos={datos.previstos.filter((p) => p.estado !== "omitido" && p.fechaEsperada && p.fechaEsperada <= limiteAgenda)}
+        />
       </div>
 
       <div className={estilos.columna}>

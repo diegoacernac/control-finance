@@ -1,5 +1,5 @@
 import type { PostgrestError } from "@supabase/supabase-js";
-import { finDeMes, inicioDeMes } from "../fechas/lima.ts";
+import { finDeMes, inicioDeMes, sumarDias } from "../fechas/lima.ts";
 import type { EstadoPrevisto } from "../movimientos/registrar-movimiento-manual.ts";
 import type { Moneda, TipoMovimiento } from "../movimientos/tipos.ts";
 import { crearClienteServidor } from "../supabase/cliente-servidor.ts";
@@ -59,8 +59,9 @@ export async function cargarPanel(hoy: string): Promise<DatosPanel> {
   const inicio = inicioDeMes(hoy);
   const fin = finDeMes(hoy);
 
-  // Los previstos del mes deben existir aunque todavía no se haya registrado nada.
-  const { error: errorGeneracion } = await supabase.rpc("asegurar_previstos", { p_hasta: fin });
+  // La agenda puede cubrir los primeros días del mes siguiente.
+  const finSemana = sumarDias(hoy, 7);
+  const { error: errorGeneracion } = await supabase.rpc("asegurar_previstos", { p_hasta: finSemana > fin ? finSemana : fin });
   if (errorGeneracion) throw errorDeCarga("los previstos", errorGeneracion);
 
   const [saldos, previstos, delMes, porRevisar, ultimos, categorias] = await Promise.all([

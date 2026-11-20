@@ -38,7 +38,8 @@ export default async function PaginaPlanificar({ searchParams }: PageProps<"/pla
     gastoVariableMensualCentimos: datos.gastoVariableMensualCentimos,
     gastoVariableDelMesCentimos: datos.gastoVariableDelMesCentimos,
   });
-  const grupos = previstosDelRango(datos.previstos, rango);
+  const grupos = previstosDelRango(datos.previstos, { ...rango, tipo: "todo" });
+  const lista = rango.tipo === "todo" ? grupos : previstosDelRango(datos.previstos, rango);
 
   return (
     <main className={estilos.pagina}>
@@ -60,7 +61,7 @@ export default async function PaginaPlanificar({ searchParams }: PageProps<"/pla
       </div>
 
       <div className={estilos.columnaPrincipal}>
-        <ListaDelRango grupos={grupos} tipo={rango.tipo} />
+        <ListaDelRango grupos={lista} rango={rango} />
       </div>
 
       <div className={estilos.columnaLateral}>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useId } from "react";
 import { formatearCifra } from "@/lib/movimientos/formato-monto.ts";
 import { confirmarPrevisto } from "../acciones.ts";
 import estilos from "../panel.module.css";
@@ -11,7 +11,7 @@ type Props = { previstoId: number; restanteCentimos: number; hoy: string; esCobr
 // de guardar (Disney que cobró unos soles más, un pago en partes).
 export function ConfirmarPrevisto({ previstoId, restanteCentimos, hoy, esCobro }: Props) {
   const [resultado, accion, guardando] = useActionState(confirmarPrevisto.bind(null, previstoId), null);
-  const prefijo = `confirmar-${previstoId}`;
+  const prefijo = useId();
 
   return (
     <form action={accion} className={estilos.formularioConfirmar}>

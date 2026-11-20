@@ -3,14 +3,18 @@
 import { useActionState } from "react";
 import { formatearCifra } from "@/lib/movimientos/formato-monto.ts";
 import { LARGO_MAXIMO_TEXTO } from "@/lib/movimientos/limites.ts";
-import type { MovimientoPanel, OpcionCategoria, PrevistoPanel } from "@/lib/panel/tipos.ts";
+import type { MovimientoPanel, OpcionCategoria } from "@/lib/panel/tipos.ts";
 import { editarMovimiento } from "../acciones.ts";
 import estilos from "../panel.module.css";
-import { SelectorDestino } from "./SelectorDestino.tsx";
+import { SelectorDestino, type PrevistoDestino } from "./SelectorDestino.tsx";
+
+export type MovimientoEditable = Pick<MovimientoPanel,
+  "id" | "tipo" | "moneda" | "montoCentimos" | "fecha" | "descripcion" | "previstoNombre" | "categoriaNombre"
+>;
 
 type Props = {
-  movimiento: MovimientoPanel;
-  previstosAbiertos: PrevistoPanel[];
+  movimiento: MovimientoEditable;
+  previstosAbiertos: PrevistoDestino[];
   categorias: OpcionCategoria[];
 };
 

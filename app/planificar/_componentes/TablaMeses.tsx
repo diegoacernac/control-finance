@@ -12,8 +12,6 @@ const COLUMNAS: Columna[] = [
   { etiqueta: "Variable", valor: (m) => m.variableCentimos, signo: "−" },
 ];
 
-// Una fila por mes, como en la hoja de cálculo. En el celular cada mes se
-// vuelve un bloque con sus etiquetas (data-etiqueta en CSS).
 export function TablaMeses({ meses }: { meses: MesProyectado[] }) {
   return (
     <section aria-labelledby="titulo-meses">
@@ -42,23 +40,42 @@ export function TablaMeses({ meses }: { meses: MesProyectado[] }) {
                 {nombreDelMes(mes.mes)}
                 {indice === 0 && <span className={estilos.notaMes}> lo que falta</span>}
               </th>
-              <td data-etiqueta="Empiezas">{formatearConSignoReal(mes.inicioCentimos)}</td>
+              <td>{formatearConSignoReal(mes.inicioCentimos)}</td>
               {COLUMNAS.map((columna) => (
-                <td key={columna.etiqueta} data-etiqueta={columna.etiqueta}>
+                <td key={columna.etiqueta}>
                   {cifraConSigno(columna.valor(mes), columna.signo)}
                 </td>
               ))}
-              <td data-etiqueta="Libre" className={mes.libreCentimos < 0 ? estilos.negativo : estilos.libre}>
+              <td className={mes.libreCentimos < 0 ? estilos.negativo : estilos.libre}>
                 {formatearConSignoReal(mes.libreCentimos)}
               </td>
-              <td data-etiqueta="Ahorro">{cifraConSigno(mes.ahorroCentimos, "−")}</td>
-              <td data-etiqueta="Cierras" className={`${estilos.cierre} ${mes.cierreCentimos < 0 ? estilos.negativo : ""}`}>
+              <td>{cifraConSigno(mes.ahorroCentimos, "−")}</td>
+              <td className={`${estilos.cierre} ${mes.cierreCentimos < 0 ? estilos.negativo : ""}`}>
                 {formatearConSignoReal(mes.cierreCentimos)}
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+      <div className={estilos.mesesMovil}>
+        {meses.map((mes, indice) => (
+          <details key={mes.mes}>
+            <summary>
+              <strong>{nombreDelMes(mes.mes)} {mes.mes.slice(0, 4)}</strong>
+              <span className={mes.libreCentimos < 0 ? estilos.negativo : estilos.libre}>Libre {formatearConSignoReal(mes.libreCentimos)}</span>
+              <span className={mes.cierreCentimos < 0 ? estilos.negativo : estilos.cierre}>Cierre {formatearConSignoReal(mes.cierreCentimos)}</span>
+            </summary>
+            {indice === 0 && <p className={estilos.notaMes}>Lo que falta del mes</p>}
+            <dl>
+              <div><dt>Empiezas</dt><dd>{formatearConSignoReal(mes.inicioCentimos)}</dd></div>
+              {COLUMNAS.map(columna => (
+                <div key={columna.etiqueta}><dt>{columna.etiqueta}</dt><dd>{cifraConSigno(columna.valor(mes), columna.signo)}</dd></div>
+              ))}
+              <div><dt>Ahorro</dt><dd>{cifraConSigno(mes.ahorroCentimos, "−")}</dd></div>
+            </dl>
+          </details>
+        ))}
+      </div>
       <p className={estilos.leyendaTabla}>
         Libre = lo que entra menos fijos, únicos y gasto variable: lo que podrías ahorrar. Lo omitido y lo que no tiene
         fecha no cuenta.

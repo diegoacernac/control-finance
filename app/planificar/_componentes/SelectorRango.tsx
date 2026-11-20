@@ -21,7 +21,7 @@ const TIPOS: { valor: FiltroTipo; etiqueta: string }[] = [
 // guardar una vista como enlace.
 export function SelectorRango({ rango, hoy }: { rango: RangoPlan; hoy: string }) {
   return (
-    <section aria-label="Rango y filtro" className={estilos.selector}>
+    <section aria-label="Periodo de planificación" className={estilos.selector}>
       <nav aria-label="Rango" className={estilos.segmentos}>
         {VISTAS.map((vista) => (
           <Link
@@ -31,19 +31,6 @@ export function SelectorRango({ rango, hoy }: { rango: RangoPlan; hoy: string })
             className={estilos.segmento}
           >
             {vista.etiqueta}
-          </Link>
-        ))}
-      </nav>
-
-      <nav aria-label="Tipo" className={estilos.segmentos}>
-        {TIPOS.map((tipo) => (
-          <Link
-            key={tipo.valor}
-            href={enlace({ ...parametrosDeVista(rango), tipo: tipo.valor })}
-            aria-current={rango.tipo === tipo.valor ? "page" : undefined}
-            className={estilos.segmento}
-          >
-            {tipo.etiqueta}
           </Link>
         ))}
       </nav>
@@ -103,4 +90,22 @@ function enlace(parametros: Record<string, string>): string {
   const { tipo, ...resto } = parametros;
   const conTipo = tipo === "todo" ? resto : parametros;
   return `/planificar?${new URLSearchParams(conTipo).toString()}`;
+}
+
+export function SelectorTipo({ rango }: { rango: RangoPlan }) {
+  return (
+    <nav aria-label="Filtrar movimientos previstos" className={estilos.segmentos}>
+      {TIPOS.map((tipo) => (
+        <Link
+          key={tipo.valor}
+          scroll={false}
+          href={enlace({ ...parametrosDeVista(rango), tipo: tipo.valor })}
+          aria-current={rango.tipo === tipo.valor ? "page" : undefined}
+          className={estilos.segmento}
+        >
+          {tipo.etiqueta}
+        </Link>
+      ))}
+    </nav>
+  );
 }

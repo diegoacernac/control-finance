@@ -2,6 +2,8 @@ import { diaYMes, nombreDelMes } from "@/lib/fechas/formato.ts";
 import { formatearCifra, formatearConSigno } from "@/lib/movimientos/formato-monto.ts";
 import type { GrupoDelMes } from "@/lib/planificar/lista-del-rango.ts";
 import { estaAbierto, restanteCentimos } from "@/lib/planificar/proyectar-meses.ts";
+import { SelectorTipo } from "./SelectorRango.tsx";
+import type { RangoPlan } from "@/lib/planificar/rango.ts";
 import type { FiltroTipo, PrevistoPlan } from "@/lib/planificar/tipos.ts";
 import { omitirPrevisto, reabrirPrevisto } from "../../acciones.ts";
 import estilosPanel from "../../panel.module.css";
@@ -16,12 +18,13 @@ const TITULO: Record<FiltroTipo, string> = {
 
 // Omitir aquí es decidir con anticipación ("en marzo no pago HBO"): el mes
 // siguiente de la tabla se recalcula sin ese pago.
-export function ListaDelRango({ grupos, tipo }: { grupos: GrupoDelMes[]; tipo: FiltroTipo }) {
+export function ListaDelRango({ grupos, rango }: { grupos: GrupoDelMes[]; rango: RangoPlan }) {
   return (
     <section aria-labelledby="titulo-lista">
       <h2 id="titulo-lista" className={estilos.titulo}>
-        {TITULO[tipo]}
+        {TITULO[rango.tipo]}
       </h2>
+      <SelectorTipo rango={rango} />
 
       {grupos.length === 0 && <p className={estilosPanel.vacio}>No hay nada previsto en estas fechas.</p>}
 

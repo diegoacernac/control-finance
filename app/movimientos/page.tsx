@@ -5,24 +5,15 @@ import { esFechaIsoValida, finDeMes } from "@/lib/fechas/lima.ts";
 import { SIN_CATEGORIA } from "@/lib/panel/gasto-por-categoria.ts";
 import { diaYMes, nombreDelMes } from "@/lib/fechas/formato.ts";
 import { formatearMonto } from "@/lib/movimientos/formato-monto.ts";
-import type { Moneda } from "@/lib/movimientos/tipos.ts";
+import { EditarMovimiento, type MovimientoEditable } from "../_componentes/EditarMovimiento.tsx";
+import type { PrevistoDestino } from "../_componentes/SelectorDestino.tsx";
+import type { OpcionCategoria } from "@/lib/panel/tipos.ts";
 import { crearClienteServidor } from "@/lib/supabase/cliente-servidor.ts";
 import panel from "../panel.module.css";
 import estilos from "./movimientos.module.css";
 
 export const instant = false;
 const POR_PAGINA = 25;
-
-type Registro = {
-  id: number;
-  descripcion: string;
-  fecha: string;
-  tipo: "ingreso" | "egreso";
-  categoria_nombre: string | null;
-  previsto_nombre: string | null;
-  monto_centimos: number;
-  moneda: Moneda;
-};
 
 export default async function Movimientos({ searchParams }: PageProps<"/movimientos">) {
   await connection();
@@ -36,8 +27,9 @@ export default async function Movimientos({ searchParams }: PageProps<"/movimien
   const numero = Number(parametros.p);
   const pagina = Number.isInteger(numero) && numero >= 1 && numero <= 1_000_000 ? numero : 1;
   const inicio = (pagina - 1) * POR_PAGINA;
-  let consulta = crearClienteServidor().from("movimientos_con_categoria")
-    .select("id, descripcion, fecha, tipo, categoria_nombre, previsto_nombre, monto_centimos, moneda")
+  const supabase = crearClienteServidor();
+  let consulta = supabase.from("movimientos_con_categoria")
+    .select("id, descripcion, fecha, tipo, categoriaNombre:categoria_nombre, previstoNombre:previsto_nombre, montoCentimos:monto_centimos, moneda")
     .order("fecha", { ascending: false }).order("id", { ascending: false });
   if (gasto) {
     const desde = `${gasto.mes}-01`;
@@ -51,13 +43,16 @@ export default async function Movimientos({ searchParams }: PageProps<"/movimien
     const literal = texto.replace(/[\\%_]/g, "\\$&");
     consulta = consulta.ilike("descripcion", `%${literal}%`);
   }
-  const { data, error } = await consulta.range(inicio, inicio + POR_PAGINA).overrideTypes<Registro[], { merge: false }>();
+  const { data, error } = await consulta.range(inicio, inicio + POR_PAGINA).overrideTypes<MovimientoEditable[], { merge: false }>();
   if (error) throw new Error("No se pudo cargar el historial de movimientos.");
   const registros = data.slice(0, POR_PAGINA);
-  function enlace(p: number) {
+  const editando = registros.find(r => String(r.id) === parametros.editar);
+  const opciones = editando ? await cargarOpciones(supabase, editando.tipo) : null;
+  function enlace(p: number, editar?: number) {
     const filtros = new URLSearchParams(gasto ?? {});
     if (texto) filtros.set("q", texto);
     filtros.set("p", String(p));
+    if (editar) filtros.set("editar", String(editar));
     return `/movimientos?${filtros}`;
   }
 
@@ -91,11 +86,19 @@ export default async function Movimientos({ searchParams }: PageProps<"/movimien
               <time dateTime={r.fecha}>{diaYMes(r.fecha)} {r.fecha.slice(0, 4)}</time>
               <div className={estilos.descripcion}>
                 {r.descripcion}
-                <small>{r.previsto_nombre ?? r.categoria_nombre ?? "Sin categoría"}</small>
+                <small>{r.previstoNombre ?? r.categoriaNombre ?? "Sin categoría"}</small>
               </div>
               <span className={r.tipo === "ingreso" ? panel.ingreso : panel.egreso}>
-                {r.tipo === "ingreso" ? "+" : "−"} {formatearMonto(r.monto_centimos, r.moneda)}
+                {r.tipo === "ingreso" ? "+" : "−"} {formatearMonto(r.montoCentimos, r.moneda)}
               </span>
+              <div className={estilos.edicion}>
+                {editando?.id === r.id && opciones ? (
+                  <>
+                    <Link href={enlace(pagina)} scroll={false} className={panel.botonTexto}>Cerrar edición</Link>
+                    <EditarMovimiento movimiento={r} previstosAbiertos={opciones.previstos} categorias={opciones.categorias} />
+                  </>
+                ) : <Link href={enlace(pagina, r.id)} scroll={false} prefetch={false} className={panel.botonTexto} aria-label={`Editar ${r.descripcion}`}>Editar</Link>}
+              </div>
             </li>
           ))}
         </ul>
@@ -109,4 +112,16 @@ export default async function Movimientos({ searchParams }: PageProps<"/movimien
       )}
     </main>
   );
+}
+
+async function cargarOpciones(supabase: ReturnType<typeof crearClienteServidor>, tipo: MovimientoEditable["tipo"]) {
+  const [previstos, categorias] = await Promise.all([
+    supabase.from("previstos_con_pago").select("id, tipo, nombre, persona, fechaEsperada:fecha_esperada")
+      .eq("tipo", tipo).in("estado", ["pendiente", "parcial"]).order("fecha_esperada").order("id")
+      .overrideTypes<PrevistoDestino[], { merge: false }>(),
+    supabase.from("categorias_con_nombre").select("id, tipo, nombre:nombre_completo")
+      .eq("tipo", tipo).order("nombre_completo").overrideTypes<OpcionCategoria[], { merge: false }>(),
+  ]);
+  if (previstos.error || categorias.error) throw new Error("No se pudieron cargar las opciones de edición.");
+  return { previstos: previstos.data, categorias: categorias.data };
 }

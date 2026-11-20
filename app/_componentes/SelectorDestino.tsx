@@ -4,11 +4,13 @@ import { valorDestino } from "@/lib/panel/destino.ts";
 import type { OpcionCategoria, PrevistoPanel } from "@/lib/panel/tipos.ts";
 import estilos from "../panel.module.css";
 
+export type PrevistoDestino = Pick<PrevistoPanel, "id" | "nombre" | "tipo" | "persona" | "fechaEsperada">;
+
 type Props = {
   id: string;
   tipo: TipoMovimiento;
   moneda: Moneda;
-  previstosAbiertos: PrevistoPanel[];
+  previstosAbiertos: PrevistoDestino[];
   categorias: OpcionCategoria[];
   // Texto de la primera opción (valor vacío). Si es obligatoria, no se puede elegir.
   opcionVacia: { texto: string; obligatoria: boolean };

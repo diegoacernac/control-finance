@@ -66,6 +66,7 @@ export async function editarMovimiento(
   if (error) return { ok: false, mensaje: `No se pudo guardar: ${error.message}` };
 
   revalidatePath("/");
+  revalidatePath("/movimientos");
   return { ok: true, mensaje: "Cambios guardados." };
 }
 

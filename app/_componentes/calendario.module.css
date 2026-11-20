@@ -1,0 +1,55 @@
+.itemAgenda {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 12px;
+  align-items: baseline;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--regla);
+}
+
+.itemAgenda strong {
+  overflow-wrap: anywhere;
+}
+
+.itemAgenda small,
+.itemAgenda details {
+  grid-column: 1 / -1;
+}
+
+.itemAgenda small {
+  color: var(--tenue);
+}
+
+.itemAgenda summary,
+.grupoAgenda summary {
+  cursor: pointer;
+}
+
+.cambiarVista,
+.agendaMovil {
+  display: none;
+}
+
+@media (max-width: 899px) {
+  .agendaMovil,
+  .cambiarVista {
+    display: block;
+  }
+
+  .cambiarVista {
+    border: 1px solid var(--regla);
+    background: transparent;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+    cursor: pointer;
+  }
+
+  .mesEnEscritorio {
+    display: none;
+  }
+
+  .grupoAgenda > summary {
+    padding: 12px 0;
+    border-top: 1px solid var(--regla);
+  }
+}

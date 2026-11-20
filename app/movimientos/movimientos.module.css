@@ -65,3 +65,8 @@
   justify-content: space-between;
   gap: 4px 16px;
 }
+
+.edicion {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
