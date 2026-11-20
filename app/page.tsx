@@ -85,7 +85,7 @@ export default async function PaginaPanel() {
           categorias={datos.categorias}
         />
         <PrevistosDelMes grupos={grupos} hoy={hoy} />
-        <GastoPorCategoria gasto={calcularGastoDelMes(datos.movimientosDelMes)} />
+        <GastoPorCategoria mes={hoy.slice(0, 7)} gasto={calcularGastoDelMes(datos.movimientosDelMes)} />
         <UltimosMovimientos
           movimientos={datos.ultimosMovimientos}
           previstosAbiertos={previstosAbiertos}

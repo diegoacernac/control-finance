@@ -462,7 +462,15 @@
   margin-bottom: 6px;
 }
 
+.filaGasto > span:first-child {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .filaGasto {
+  color: var(--tinta);
+  text-decoration: none;
+  min-height: 44px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 5px 12px;

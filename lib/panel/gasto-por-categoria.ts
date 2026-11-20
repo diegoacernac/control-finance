@@ -4,7 +4,7 @@ export type GastoCategoria = { nombre: string; centimos: number; porcentaje: num
 
 export type GastoDelMes = { totalCentimos: number; categorias: GastoCategoria[] };
 
-const SIN_CATEGORIA = "Sin categoría";
+export const SIN_CATEGORIA = "Sin categoría";
 const PORCENTAJE_TOTAL = 100;
 
 // Solo egresos en soles que son gasto: un préstamo otorgado vuelve, no se
