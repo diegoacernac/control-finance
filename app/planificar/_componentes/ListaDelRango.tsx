@@ -6,6 +6,7 @@ import type { FiltroTipo, PrevistoPlan } from "@/lib/planificar/tipos.ts";
 import { omitirPrevisto, reabrirPrevisto } from "../../acciones.ts";
 import estilosPanel from "../../panel.module.css";
 import estilos from "../planificar.module.css";
+import { BotonEnviar } from "../../_componentes/BotonEnviar.tsx";
 
 const TITULO: Record<FiltroTipo, string> = {
   todo: "Pagos y cobros",
@@ -58,9 +59,9 @@ function FilaPlan({ previsto }: { previsto: PrevistoPlan }) {
       <div className={estilosPanel.filaDetalle}>
         {detalles(previsto).join(" · ")}
         <form action={(omitido ? reabrirPrevisto : omitirPrevisto).bind(null, previsto.id)} className={estilosPanel.enLinea}>
-          <button type="submit" className={estilosPanel.botonTexto}>
+          <BotonEnviar className={estilosPanel.botonTexto} textoEnviando={omitido ? "Reabriendo…" : "Omitiendo…"}>
             {omitido ? "Reabrir" : "Omitir"}
-          </button>
+          </BotonEnviar>
         </form>
       </div>
     </li>

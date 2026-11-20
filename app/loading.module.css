@@ -1,0 +1,38 @@
+.contenedor {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+/* Una franja de tinta que recorre la regla de la cabecera. */
+.barra {
+  height: 1.5px;
+  background: linear-gradient(to right, var(--tinta) 0 30%, transparent 30%) no-repeat;
+  background-size: 200% 100%;
+  border-bottom: 1px dotted var(--regla);
+  animation: recorrer 1.1s linear infinite;
+}
+
+.texto {
+  margin-top: 18px;
+  color: var(--tenue);
+  font-family: var(--fuente-titulo), serif;
+  font-style: italic;
+  font-size: 17px;
+}
+
+@keyframes recorrer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .barra {
+    animation: none;
+    background: var(--tinta);
+  }
+}

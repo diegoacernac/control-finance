@@ -1,6 +1,7 @@
 import { ingresarConGoogle } from "./acciones.ts";
 import { FormularioIngreso } from "./FormularioIngreso.tsx";
 import estilos from "./ingresar.module.css";
+import { BotonEnviar } from "../_componentes/BotonEnviar.tsx";
 
 // Lee ?error= de la URL; el permiso del layout no cubre los datos de la URL.
 export const instant = false;
@@ -26,9 +27,9 @@ export default async function PaginaIngresar({ searchParams }: PageProps<"/ingre
       )}
 
       <form action={ingresarConGoogle} className={estilos.google}>
-        <button type="submit" className={estilos.boton}>
+        <BotonEnviar className={estilos.boton} textoEnviando="Abriendo Google…">
           Entrar con Google
-        </button>
+        </BotonEnviar>
       </form>
 
       <details className={estilos.alternativa}>

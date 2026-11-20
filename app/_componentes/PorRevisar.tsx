@@ -4,6 +4,7 @@ import type { MovimientoPanel, OpcionCategoria, PrevistoPanel } from "@/lib/pane
 import { resolverMovimiento } from "../acciones.ts";
 import estilos from "../panel.module.css";
 import { SelectorDestino } from "./SelectorDestino.tsx";
+import { BotonEnviar } from "./BotonEnviar.tsx";
 
 type Props = {
   movimientos: MovimientoPanel[];
@@ -45,9 +46,9 @@ export function PorRevisar({ movimientos, previstosAbiertos, categorias }: Props
                 categorias={categorias}
                 opcionVacia={{ texto: "¿A qué corresponde?", obligatoria: true }}
               />
-              <button type="submit" className={estilos.boton}>
+              <BotonEnviar className={estilos.boton} textoEnviando="Guardando…">
                 Guardar
-              </button>
+              </BotonEnviar>
             </form>
           </li>
         ))}

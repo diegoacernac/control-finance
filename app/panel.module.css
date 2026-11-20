@@ -6,11 +6,13 @@
   gap: 32px;
 }
 
+/* En el celular las acciones bajan a una segunda fila en vez de ensanchar la página. */
 .cabecera {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: baseline;
-  gap: 16px;
+  gap: 10px 16px;
   border-bottom: 1.5px solid var(--tinta);
   padding-bottom: 10px;
 }
@@ -25,8 +27,9 @@
 
 .acciones {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
-  gap: 16px;
+  gap: 8px 16px;
 }
 
 .selectorTema {
@@ -508,6 +511,13 @@
   cursor: wait;
   background: var(--tenue);
   border-color: var(--tenue);
+}
+
+.botonTexto:disabled,
+.botonPeligro:disabled,
+.opcionTema:disabled {
+  cursor: wait;
+  opacity: 0.6;
 }
 
 .mensajeOk,

@@ -6,6 +6,7 @@ import type { PrevistoPanel } from "@/lib/panel/tipos.ts";
 import { omitirPrevisto, reabrirPrevisto } from "../acciones.ts";
 import estilos from "../panel.module.css";
 import { ConfirmarPrevisto } from "./ConfirmarPrevisto.tsx";
+import { BotonEnviar } from "./BotonEnviar.tsx";
 
 export function PrevistosDelMes({ grupos, hoy }: { grupos: PrevistosAgrupados; hoy: string }) {
   const nadaAbierto = grupos.atrasados.length + grupos.proximos.length + grupos.sinFecha.length === 0;
@@ -92,16 +93,16 @@ function FilaPrevisto({ previsto, hoy }: { previsto: PrevistoPanel; hoy: string 
         )}
         {abierto && (
           <form action={omitirPrevisto.bind(null, previsto.id)} className={estilos.enLinea}>
-            <button type="submit" className={estilos.botonTexto}>
+            <BotonEnviar className={estilos.botonTexto} textoEnviando="Omitiendo…">
               Omitir
-            </button>
+            </BotonEnviar>
           </form>
         )}
         {omitido && (
           <form action={reabrirPrevisto.bind(null, previsto.id)} className={estilos.enLinea}>
-            <button type="submit" className={estilos.botonTexto}>
+            <BotonEnviar className={estilos.botonTexto} textoEnviando="Reabriendo…">
               Reabrir
-            </button>
+            </BotonEnviar>
           </form>
         )}
       </div>

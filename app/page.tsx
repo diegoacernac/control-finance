@@ -19,6 +19,7 @@ import { SelectorTema } from "./_componentes/SelectorTema.tsx";
 import { UltimosMovimientos } from "./_componentes/UltimosMovimientos.tsx";
 import { cerrarSesion } from "./ingresar/acciones.ts";
 import estilos from "./panel.module.css";
+import { BotonEnviar } from "./_componentes/BotonEnviar.tsx";
 
 export default async function PaginaPanel() {
   await exigirPropietario();
@@ -44,9 +45,9 @@ export default async function PaginaPanel() {
           </Link>
           <SelectorTema actual={await leerTema()} />
           <form action={cerrarSesion}>
-            <button type="submit" className={estilos.botonTexto}>
+            <BotonEnviar className={estilos.botonTexto} textoEnviando="Saliendo…">
               Salir
-            </button>
+            </BotonEnviar>
           </form>
         </div>
       </header>

@@ -4,6 +4,7 @@ import type { MovimientoPanel, OpcionCategoria, PrevistoPanel } from "@/lib/pane
 import { eliminarMovimiento } from "../acciones.ts";
 import estilos from "../panel.module.css";
 import { EditarMovimiento } from "./EditarMovimiento.tsx";
+import { BotonEnviar } from "./BotonEnviar.tsx";
 
 type Props = {
   movimientos: MovimientoPanel[];
@@ -41,9 +42,9 @@ export function UltimosMovimientos({ movimientos, previstosAbiertos, categorias 
                 <details className={estilos.confirmar}>
                   <summary className={estilos.botonTexto}>Eliminar</summary>
                   <form action={eliminarMovimiento.bind(null, movimiento.id)} className={estilos.enLinea}>
-                    <button type="submit" className={estilos.botonPeligro}>
+                    <BotonEnviar className={estilos.botonPeligro} textoEnviando="Eliminando…">
                       Sí, eliminar
-                    </button>
+                    </BotonEnviar>
                   </form>
                 </details>
               </div>

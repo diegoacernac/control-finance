@@ -7,6 +7,7 @@ import estilosPanel from "../../panel.module.css";
 import { quitarPlaneado } from "../acciones.ts";
 import estilos from "../planificar.module.css";
 import { FormularioPlaneado } from "./FormularioPlaneado.tsx";
+import { BotonEnviar } from "../../_componentes/BotonEnviar.tsx";
 
 type Props = { planeados: PrevistoPlan[]; categorias: OpcionCategoria[]; hoy: string };
 
@@ -36,9 +37,9 @@ export function Planeados({ planeados, categorias, hoy }: Props) {
                   <details className={estilosPanel.confirmar}>
                     <summary className={estilosPanel.botonTexto}>Quitar</summary>
                     <form action={quitarPlaneado.bind(null, planeado.id)} className={estilosPanel.enLinea}>
-                      <button type="submit" className={estilosPanel.botonPeligro}>
+                      <BotonEnviar className={estilosPanel.botonPeligro} textoEnviando="Quitando…">
                         Sí, quitar
-                      </button>
+                      </BotonEnviar>
                     </form>
                   </details>
                 )}
